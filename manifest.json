@@ -1,7 +1,7 @@
 {
   "id": "ezdict",
   "name": "Ezdict",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "minAppVersion": "1.7.2",
   "description": "High-performance offline markdown dictionary reader and lookup engine with instant byte-range slicing.",
   "author": "jmedzen",
