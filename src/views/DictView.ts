@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf, MarkdownRenderer, Component, setIcon, Notice } from 'obsidian';
+import { ItemView, WorkspaceLeaf, MarkdownView, Editor, MarkdownRenderer, Component, setIcon, Notice } from 'obsidian';
 import type MdtermPlugin from '../main';
 import { DictEntry, DictFileMetadata, DictSearchMode, SearchResult } from '../types';
 
@@ -397,14 +397,6 @@ export class DictView extends ItemView {
 	}
 
 	private insertEntryIntoActiveNote(entry: DictEntry, file: DictFileMetadata, content: string): void {
-		const activeView = this.app.workspace.getActiveViewOfType(ItemView);
-		const editor = (this.app.workspace as any).activeEditor?.editor;
-
-		if (!editor) {
-			new Notice('⚠️ 請先在編輯器中點擊您想要插入的位置');
-			return;
-		}
-
 		const template = this.plugin.settings.citationTemplate;
 		let insertText = '';
 
@@ -420,8 +412,41 @@ export class DictView extends ItemView {
 			insertText = `\n### 《${file.name}》【${entry.cleanHeadword}】\n${content.trim()}\n\n`;
 		}
 
-		editor.replaceSelection(insertText);
-		new Notice(`✅ 已插入《${file.name}》【${entry.cleanHeadword}】`);
+		// Find the active or most recent Markdown editor
+		let targetEditor: Editor | null = null;
+
+		// 1. Try active MarkdownView
+		const activeMdView = this.app.workspace.getActiveViewOfType(MarkdownView);
+		if (activeMdView && activeMdView.editor) {
+			targetEditor = activeMdView.editor;
+		}
+
+		// 2. Try looking in all workspace leaves for an open MarkdownView
+		if (!targetEditor) {
+			const mdLeaves = this.app.workspace.getLeavesOfType('markdown');
+			for (const leaf of mdLeaves) {
+				if (leaf.view instanceof MarkdownView && leaf.view.editor) {
+					targetEditor = leaf.view.editor;
+					this.app.workspace.setActiveLeaf(leaf, { focus: true });
+					break;
+				}
+			}
+		}
+
+		// 3. Try app.workspace.activeEditor
+		if (!targetEditor && (this.app.workspace as any).activeEditor?.editor) {
+			targetEditor = (this.app.workspace as any).activeEditor.editor;
+		}
+
+		if (targetEditor) {
+			targetEditor.focus();
+			targetEditor.replaceSelection(insertText);
+			new Notice(`✅ 已成功插入《${file.name}》【${entry.cleanHeadword}】`);
+		} else {
+			// If no editor is open, copy to clipboard and notify clearly
+			navigator.clipboard.writeText(insertText);
+			new Notice(`📋 目前未開啟任何筆記編輯器，已將引用複製至剪貼簿！`);
+		}
 	}
 
 	private showResultsView(): void {
