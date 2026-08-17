@@ -19,9 +19,9 @@ export class EzdictSettingTab extends PluginSettingTab {
 		// 1. Dictionary Directory Setting
 		new Setting(containerEl)
 			.setName('辭典目錄路徑 (Dictionary Path)')
-			.setDesc('存放 .md 辭典檔案的資料夾路徑。支援 Vault 內部相對路徑（如 dicts）或電腦上的絕對路徑。')
+			.setDesc('存放 .md 辭典檔案的資料夾路徑。支援 Vault 內部相對路徑（如 dictionary_folder）或電腦上的絕對路徑。')
 			.addText(text => text
-				.setPlaceholder('例如: dicts 或 /Users/jm/dicts')
+				.setPlaceholder('例如: dictionary_folder 或 /Users/jm/dictionary_folder')
 				.setValue(this.plugin.settings.dictDirectory)
 				.onChange(async (value) => {
 					this.plugin.settings.dictDirectory = value.trim();

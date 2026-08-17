@@ -61,7 +61,7 @@ export interface EzdictSettings {
 }
 
 export const DEFAULT_SETTINGS: EzdictSettings = {
-	dictDirectory: "dicts",
+	dictDirectory: "dictionary_folder",
 	entryHeadingLevel: 3,           // default: h3 (###)
 	defaultMode: "prefix",
 	maxResultsPerDict: 350,
