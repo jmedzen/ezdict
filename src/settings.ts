@@ -14,9 +14,9 @@ export class EzdictSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		// Header using official Setting.setHeading() API
+		// Header without plugin name per official guidelines
 		new Setting(containerEl)
-			.setName('Ezdict')
+			.setName('一般設定 (General Settings)')
 			.setHeading();
 
 		// 1. Dictionary Directory Setting
