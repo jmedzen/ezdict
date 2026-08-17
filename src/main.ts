@@ -22,7 +22,7 @@ export default class MdtermPlugin extends Plugin {
 		);
 
 		// Add Ribbon Icon in left bar
-		this.addRibbonIcon('book-open', 'mdterm 辭典', async () => {
+		this.addRibbonIcon('book-open', 'mdterm', async () => {
 			await this.activateSidebarView();
 		});
 

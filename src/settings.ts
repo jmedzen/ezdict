@@ -14,7 +14,7 @@ export class MdtermSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		containerEl.createEl('h2', { text: '🪷 mdterm — 離線辭典外掛設定' });
+		containerEl.createEl('h2', { text: 'mdterm' });
 
 		// 1. Dictionary Directory Setting
 		new Setting(containerEl)

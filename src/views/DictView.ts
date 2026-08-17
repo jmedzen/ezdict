@@ -30,7 +30,7 @@ export class DictView extends ItemView {
 	}
 
 	getDisplayText(): string {
-		return 'mdterm 辭典';
+		return 'mdterm';
 	}
 
 	getIcon(): string {
