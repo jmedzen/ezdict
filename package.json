@@ -1,7 +1,7 @@
 {
-  "name": "mdterm",
+  "name": "ezdict",
   "version": "0.9.0",
-  "description": "High-performance offline dictionary reader and lookup plugin for Obsidian, designed for massive markdown reference books and Buddhist sutra dictionaries.",
+  "description": "High-performance offline dictionary reader and lookup plugin for Obsidian, designed for massive markdown reference books and dictionaries.",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
@@ -11,7 +11,6 @@
     "obsidian",
     "obsidian-plugin",
     "dictionary",
-    "buddhism",
     "offline-dictionary",
     "search",
     "markdown-reader"

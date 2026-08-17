@@ -1,5 +1,5 @@
 /**
- * mdterm — Type Definitions
+ * Ezdict — Type Definitions
  */
 
 export type DictSearchMode = 'prefix' | 'fuzzy' | 'fulltext';
@@ -16,7 +16,7 @@ export interface DictEntry {
 
 export interface DictFileMetadata {
 	id: number;
-	name: string;           // e.g. "佛光辭典"
+	name: string;           // e.g. "法相辭典"
 	path: string;           // file path relative to vault, or absolute path
 	isExternal: boolean;    // true if located outside the Obsidian vault
 	size: number;
@@ -47,7 +47,7 @@ export interface SearchResult {
 	score?: number;
 }
 
-export interface MdtermSettings {
+export interface EzdictSettings {
 	dictDirectory: string;          // Directory containing dictionary .md files
 	entryHeadingLevel: number;      // Heading level for dictionary entries (2..6, default: 3 for h3)
 	defaultMode: DictSearchMode;    // 'prefix' | 'fuzzy' | 'fulltext'
@@ -60,7 +60,7 @@ export interface MdtermSettings {
 	enableSelectionMenu: boolean;   // Enable right-click context menu item
 }
 
-export const DEFAULT_SETTINGS: MdtermSettings = {
+export const DEFAULT_SETTINGS: EzdictSettings = {
 	dictDirectory: "dicts",
 	entryHeadingLevel: 3,           // default: h3 (###)
 	defaultMode: "prefix",

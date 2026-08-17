@@ -1,12 +1,12 @@
 import { Plugin, WorkspaceLeaf, Editor, MarkdownView, Menu, Notice } from 'obsidian';
-import { DEFAULT_SETTINGS, MdtermSettings, SectionIndex } from './types';
+import { DEFAULT_SETTINGS, EzdictSettings, SectionIndex } from './types';
 import { DictEngine } from './engine/DictEngine';
-import { MdtermSettingTab } from './settings';
-import { MDTERM_VIEW_TYPE, DictView } from './views/DictView';
+import { EzdictSettingTab } from './settings';
+import { EZDICT_VIEW_TYPE, DictView } from './views/DictView';
 import { DictSuggestModal } from './views/DictModal';
 
-export default class MdtermPlugin extends Plugin {
-	settings: MdtermSettings;
+export default class EzdictPlugin extends Plugin {
+	settings: EzdictSettings;
 	engine: DictEngine;
 
 	async onload(): Promise<void> {
@@ -17,18 +17,18 @@ export default class MdtermPlugin extends Plugin {
 
 		// Register Sidebar View
 		this.registerView(
-			MDTERM_VIEW_TYPE,
+			EZDICT_VIEW_TYPE,
 			(leaf: WorkspaceLeaf) => new DictView(leaf, this)
 		);
 
 		// Add Ribbon Icon in left bar
-		this.addRibbonIcon('book-open', 'mdterm', async () => {
+		this.addRibbonIcon('book-open', 'Ezdict', async () => {
 			await this.activateSidebarView();
 		});
 
 		// Register Command: Open Sidebar View
 		this.addCommand({
-			id: 'open-mdterm-sidebar',
+			id: 'open-ezdict-sidebar',
 			name: 'show md dictionary panel',
 			callback: async () => {
 				await this.activateSidebarView();
@@ -71,7 +71,7 @@ export default class MdtermPlugin extends Plugin {
 					menu.addItem((item) => {
 						const preview = selection.length > 10 ? selection.slice(0, 10) + '…' : selection;
 						item
-							.setTitle(`在 mdterm 查詢「${preview}」`)
+							.setTitle(`在 Ezdict 查詢「${preview}」`)
 							.setIcon('book-open')
 							.onClick(async () => {
 								await this.searchInSidebar(selection);
@@ -82,7 +82,7 @@ export default class MdtermPlugin extends Plugin {
 		);
 
 		// Register Settings Tab
-		this.addSettingTab(new MdtermSettingTab(this.app, this));
+		this.addSettingTab(new EzdictSettingTab(this.app, this));
 
 		// Load Cache and initialize engine in background
 		this.app.workspace.onLayoutReady(async () => {
@@ -93,18 +93,18 @@ export default class MdtermPlugin extends Plugin {
 	}
 
 	onunload(): void {
-		this.app.workspace.detachLeavesOfType(MDTERM_VIEW_TYPE);
+		this.app.workspace.detachLeavesOfType(EZDICT_VIEW_TYPE);
 	}
 
 	async activateSidebarView(): Promise<WorkspaceLeaf> {
 		const { workspace } = this.app;
-		let leaf = workspace.getLeavesOfType(MDTERM_VIEW_TYPE)[0];
+		let leaf = workspace.getLeavesOfType(EZDICT_VIEW_TYPE)[0];
 
 		if (!leaf) {
 			const rightLeaf = workspace.getRightLeaf(false);
 			if (rightLeaf) {
 				await rightLeaf.setViewState({
-					type: MDTERM_VIEW_TYPE,
+					type: EZDICT_VIEW_TYPE,
 					active: true
 				});
 				leaf = rightLeaf;
@@ -150,7 +150,7 @@ export default class MdtermPlugin extends Plugin {
 			current._indexCache = this.engine.getCacheData();
 			await this.saveData(current);
 		} catch (e) {
-			console.warn('[mdterm] Failed to save index cache:', e);
+			console.warn('[Ezdict] Failed to save index cache:', e);
 		}
 	}
 }

@@ -1,8 +1,9 @@
 /* ================================================================
-   mdterm — Obsidian Offline Dictionary Plugin Stylesheet
+   Ezdict — Obsidian Offline Markdown Dictionary Plugin Stylesheet
    Follows Obsidian Theme System (Light / Dark / Custom Themes)
    ================================================================ */
 
+.ezdict-view-container,
 .mdterm-view-container {
 	display: flex;
 	flex-direction: column;
@@ -15,6 +16,7 @@
 }
 
 /* ── Header Area ────────────────────────────────────────────── */
+.ezdict-header,
 .mdterm-header {
 	display: flex;
 	flex-direction: column;
@@ -25,6 +27,7 @@
 	flex-shrink: 0;
 }
 
+.ezdict-search-wrap,
 .mdterm-search-wrap {
 	display: flex;
 	align-items: center;
@@ -36,11 +39,13 @@
 	transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+.ezdict-search-wrap:focus-within,
 .mdterm-search-wrap:focus-within {
 	border-color: var(--interactive-accent);
 	box-shadow: 0 0 0 2px var(--background-modifier-box-shadow, rgba(var(--interactive-accent-rgb), 0.2));
 }
 
+.ezdict-search-icon,
 .mdterm-search-icon {
 	display: flex;
 	align-items: center;
@@ -50,6 +55,7 @@
 	flex-shrink: 0;
 }
 
+.ezdict-search-input,
 .mdterm-search-input {
 	flex: 1;
 	border: none !important;
@@ -61,10 +67,12 @@
 	color: var(--text-normal) !important;
 }
 
+.ezdict-search-input::placeholder,
 .mdterm-search-input::placeholder {
 	color: var(--text-faint);
 }
 
+.ezdict-search-clear-btn,
 .mdterm-search-clear-btn {
 	background: transparent;
 	border: none;
@@ -77,12 +85,14 @@
 	border-radius: var(--radius-s, 4px);
 }
 
+.ezdict-search-clear-btn:hover,
 .mdterm-search-clear-btn:hover {
 	color: var(--text-normal);
 	background-color: var(--background-modifier-hover);
 }
 
 /* ── Mode Tabs ──────────────────────────────────────────────── */
+.ezdict-mode-tabs,
 .mdterm-mode-tabs {
 	display: flex;
 	gap: 4px;
@@ -92,6 +102,7 @@
 	border: 1px solid var(--background-modifier-border);
 }
 
+.ezdict-mode-tab,
 .mdterm-mode-tab {
 	flex: 1;
 	border: none;
@@ -106,11 +117,13 @@
 	text-align: center;
 }
 
+.ezdict-mode-tab:hover,
 .mdterm-mode-tab:hover {
 	color: var(--text-normal);
 	background-color: var(--background-modifier-hover);
 }
 
+.ezdict-mode-tab.active,
 .mdterm-mode-tab.active {
 	color: var(--text-on-accent, #ffffff);
 	background-color: var(--interactive-accent);
@@ -118,11 +131,13 @@
 }
 
 /* ── Dictionary Selector Drawer ────────────────────────────── */
+.ezdict-dict-toggle-header,
 .mdterm-dict-toggle-header {
 	display: flex;
 	align-items: center;
 }
 
+.ezdict-dict-toggle-btn,
 .mdterm-dict-toggle-btn {
 	display: flex;
 	align-items: center;
@@ -136,21 +151,25 @@
 	width: 100%;
 }
 
+.ezdict-dict-toggle-btn:hover,
 .mdterm-dict-toggle-btn:hover {
 	color: var(--text-normal);
 	background-color: var(--background-modifier-hover);
 }
 
+.ezdict-dict-chevron,
 .mdterm-dict-chevron {
 	display: flex;
 	align-items: center;
 	transition: transform 0.2s ease;
 }
 
+.ezdict-dict-toggle-btn.open .ezdict-dict-chevron,
 .mdterm-dict-toggle-btn.open .mdterm-dict-chevron {
 	transform: rotate(90deg);
 }
 
+.ezdict-dict-drawer,
 .mdterm-dict-drawer {
 	display: flex;
 	flex-direction: column;
@@ -164,10 +183,12 @@
 	transition: all 0.2s ease;
 }
 
+.ezdict-dict-drawer.collapsed,
 .mdterm-dict-drawer.collapsed {
 	display: none;
 }
 
+.ezdict-drawer-actions,
 .mdterm-drawer-actions {
 	display: flex;
 	justify-content: flex-end;
@@ -175,6 +196,7 @@
 	border-bottom: 1px solid var(--divider-color);
 }
 
+.ezdict-drawer-action-btn,
 .mdterm-drawer-action-btn {
 	font-size: 11px;
 	padding: 2px 6px;
@@ -185,17 +207,20 @@
 	cursor: pointer;
 }
 
+.ezdict-drawer-action-btn:hover,
 .mdterm-drawer-action-btn:hover {
 	color: var(--text-normal);
 	background-color: var(--background-modifier-hover);
 }
 
+.ezdict-drawer-list,
 .mdterm-drawer-list {
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
 }
 
+.ezdict-drawer-item,
 .mdterm-drawer-item {
 	display: flex;
 	align-items: center;
@@ -205,6 +230,7 @@
 	background-color: var(--background-secondary-alt);
 }
 
+.ezdict-drawer-item-name,
 .mdterm-drawer-item-name {
 	flex: 1;
 	font-size: 12px;
@@ -215,16 +241,19 @@
 	text-overflow: ellipsis;
 }
 
+.ezdict-drawer-item-count,
 .mdterm-drawer-item-count {
 	font-size: 10.5px;
 	color: var(--text-muted);
 }
 
+.ezdict-drawer-sort-btns,
 .mdterm-drawer-sort-btns {
 	display: flex;
 	gap: 2px;
 }
 
+.ezdict-drawer-sort-btn,
 .mdterm-drawer-sort-btn {
 	padding: 2px 4px;
 	background: transparent;
@@ -237,17 +266,20 @@
 	justify-content: center;
 }
 
+.ezdict-drawer-sort-btn:hover:not(:disabled),
 .mdterm-drawer-sort-btn:hover:not(:disabled) {
 	color: var(--text-normal);
 	background-color: var(--background-modifier-hover);
 }
 
+.ezdict-drawer-sort-btn:disabled,
 .mdterm-drawer-sort-btn:disabled {
 	opacity: 0.3;
 	cursor: default;
 }
 
 /* ── Body & Results ─────────────────────────────────────────── */
+.ezdict-body,
 .mdterm-body {
 	flex: 1;
 	overflow-y: auto;
@@ -255,6 +287,7 @@
 	padding: 10px 12px;
 }
 
+.ezdict-placeholder, .ezdict-loading-spinner,
 .mdterm-placeholder, .mdterm-loading-spinner {
 	display: flex;
 	flex-direction: column;
@@ -267,6 +300,7 @@
 	text-align: center;
 }
 
+.ezdict-results-status,
 .mdterm-results-status {
 	font-size: calc(var(--font-text-size) * 0.85);
 	color: var(--text-muted);
@@ -274,6 +308,7 @@
 	padding-left: 2px;
 }
 
+.ezdict-result-group,
 .mdterm-result-group {
 	margin-bottom: 12px;
 	border: 1px solid var(--background-modifier-border);
@@ -282,6 +317,7 @@
 	background-color: var(--background-secondary);
 }
 
+.ezdict-result-group-header,
 .mdterm-result-group-header {
 	display: flex;
 	align-items: center;
@@ -293,16 +329,19 @@
 	border-bottom: 1px solid var(--divider-color);
 }
 
+.ezdict-result-group-header:hover,
 .mdterm-result-group-header:hover {
 	background-color: var(--background-modifier-hover);
 }
 
+.ezdict-result-group-title,
 .mdterm-result-group-title {
 	font-size: calc(var(--font-text-size) * 0.95);
 	font-weight: 600;
 	color: var(--text-normal);
 }
 
+.ezdict-result-group-badge,
 .mdterm-result-group-badge {
 	font-size: calc(var(--font-text-size) * 0.75);
 	font-weight: 500;
@@ -312,15 +351,18 @@
 	color: var(--text-muted);
 }
 
+.ezdict-result-group.collapsed .ezdict-result-items-list,
 .mdterm-result-group.collapsed .mdterm-result-items-list {
 	display: none;
 }
 
+.ezdict-result-items-list,
 .mdterm-result-items-list {
 	display: flex;
 	flex-direction: column;
 }
 
+.ezdict-result-item,
 .mdterm-result-item {
 	padding: 9px 11px;
 	border-top: 1px solid var(--divider-color);
@@ -329,14 +371,17 @@
 	background-color: var(--background-primary);
 }
 
+.ezdict-result-item:first-child,
 .mdterm-result-item:first-child {
 	border-top: none;
 }
 
+.ezdict-result-item:hover,
 .mdterm-result-item:hover {
 	background-color: var(--background-modifier-hover);
 }
 
+.ezdict-result-headword,
 .mdterm-result-headword {
 	font-size: var(--font-text-size);
 	font-weight: 600;
@@ -344,6 +389,7 @@
 	line-height: var(--line-height-normal, 1.5);
 }
 
+.ezdict-result-snippet,
 .mdterm-result-snippet {
 	font-size: calc(var(--font-text-size) * 0.92);
 	color: var(--text-muted);
@@ -352,7 +398,9 @@
 }
 
 /* ── Search Match Highlight (Obsidian Native suggestion-highlight) ── */
+.suggestion-highlight.ezdict-highlight,
 .suggestion-highlight.mdterm-highlight,
+.ezdict-highlight,
 .mdterm-highlight {
 	background: transparent !important;
 	background-color: transparent !important;
@@ -366,17 +414,21 @@
 }
 
 /* ── Entry Detail View ──────────────────────────────────────── */
+.ezdict-entry-detail-container,
 .mdterm-entry-detail-container {
 	display: flex;
 	flex-direction: column;
 	height: 100%;
 }
 
+.ezdict-entry-detail-container.hidden,
+.ezdict-results-container.hidden,
 .mdterm-entry-detail-container.hidden,
 .mdterm-results-container.hidden {
 	display: none;
 }
 
+.ezdict-detail-nav,
 .mdterm-detail-nav {
 	display: flex;
 	align-items: center;
@@ -387,6 +439,7 @@
 	flex-shrink: 0;
 }
 
+.ezdict-detail-nav-btn,
 .mdterm-detail-nav-btn {
 	display: flex;
 	align-items: center;
@@ -400,21 +453,25 @@
 	cursor: pointer;
 }
 
+.ezdict-detail-nav-btn:hover,
 .mdterm-detail-nav-btn:hover {
 	background-color: var(--background-modifier-hover);
 }
 
+.ezdict-detail-dict-tag,
 .mdterm-detail-dict-tag {
 	font-size: 12px;
 	font-weight: 600;
 	color: var(--text-muted);
 }
 
+.ezdict-detail-actions,
 .mdterm-detail-actions {
 	display: flex;
 	gap: 4px;
 }
 
+.ezdict-action-icon-btn,
 .mdterm-action-icon-btn {
 	padding: 4px 6px;
 	background-color: var(--background-secondary);
@@ -427,11 +484,13 @@
 	justify-content: center;
 }
 
+.ezdict-action-icon-btn:hover,
 .mdterm-action-icon-btn:hover {
 	color: var(--text-normal);
 	background-color: var(--background-modifier-hover);
 }
 
+.ezdict-detail-content,
 .mdterm-detail-content {
 	flex: 1;
 	overflow-y: auto;
@@ -444,17 +503,24 @@
 	cursor: text;
 }
 
+.ezdict-detail-content *,
 .mdterm-detail-content * {
 	user-select: text !important;
 	-webkit-user-select: text !important;
 }
 
+.ezdict-detail-content a,
+.ezdict-detail-content button,
+.ezdict-detail-content input,
 .mdterm-detail-content a,
 .mdterm-detail-content button,
 .mdterm-detail-content input {
 	cursor: pointer;
 }
 
+.ezdict-detail-content h1,
+.ezdict-detail-content h2,
+.ezdict-detail-content h3,
 .mdterm-detail-content h1,
 .mdterm-detail-content h2,
 .mdterm-detail-content h3 {
@@ -463,11 +529,13 @@
 	margin-bottom: 0.5em;
 }
 
+.ezdict-detail-content p,
 .mdterm-detail-content p {
 	color: var(--text-normal);
 	margin-bottom: 0.8em;
 }
 
+.ezdict-detail-pagination,
 .mdterm-detail-pagination {
 	display: flex;
 	justify-content: space-between;
@@ -479,6 +547,7 @@
 	flex-shrink: 0;
 }
 
+.ezdict-pagination-btn,
 .mdterm-pagination-btn {
 	display: inline-flex;
 	align-items: center;
@@ -496,14 +565,17 @@
 	transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
+.ezdict-pagination-btn-prev,
 .mdterm-pagination-btn-prev {
 	justify-content: flex-start;
 }
 
+.ezdict-pagination-btn-next,
 .mdterm-pagination-btn-next {
 	justify-content: flex-end;
 }
 
+.ezdict-pagination-arrow,
 .mdterm-pagination-arrow {
 	flex-shrink: 0;
 	font-weight: 600;
@@ -511,6 +583,7 @@
 	line-height: 1;
 }
 
+.ezdict-pagination-label,
 .mdterm-pagination-label {
 	flex: 1;
 	min-width: 0;
@@ -520,46 +593,55 @@
 	line-height: 1.3;
 }
 
+.ezdict-pagination-btn-prev .ezdict-pagination-label,
 .mdterm-pagination-btn-prev .mdterm-pagination-label {
 	text-align: left;
 }
 
+.ezdict-pagination-btn-next .ezdict-pagination-label,
 .mdterm-pagination-btn-next .mdterm-pagination-label {
 	text-align: right;
 }
 
+.ezdict-pagination-btn:hover:not(:disabled),
 .mdterm-pagination-btn:hover:not(:disabled) {
 	background-color: var(--background-modifier-hover);
 	border-color: var(--interactive-accent);
 }
 
+.ezdict-pagination-btn:disabled,
 .mdterm-pagination-btn:disabled {
 	opacity: 0.35;
 	cursor: default;
 }
 
 /* ── Modal Suggestion Styles ────────────────────────────────── */
+.ezdict-modal-suggest-item,
 .mdterm-modal-suggest-item {
 	padding: 8px 12px;
 }
 
+.ezdict-modal-suggest-header,
 .mdterm-modal-suggest-header {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 }
 
+.ezdict-modal-suggest-title,
 .mdterm-modal-suggest-title {
 	font-weight: 600;
 	font-size: var(--font-text-size);
 	color: var(--text-normal);
 }
 
+.ezdict-modal-suggest-dict,
 .mdterm-modal-suggest-dict {
 	font-size: calc(var(--font-text-size) * 0.8);
 	color: var(--text-muted);
 }
 
+.ezdict-modal-suggest-snippet,
 .mdterm-modal-suggest-snippet {
 	font-size: calc(var(--font-text-size) * 0.92);
 	color: var(--text-muted);

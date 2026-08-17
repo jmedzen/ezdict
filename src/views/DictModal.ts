@@ -1,13 +1,13 @@
 import { App, SuggestModal, MarkdownRenderer, Component } from 'obsidian';
-import type MdtermPlugin from '../main';
+import type EzdictPlugin from '../main';
 import { SearchResult } from '../types';
-import { MDTERM_VIEW_TYPE, DictView } from './DictView';
+import { EZDICT_VIEW_TYPE, DictView } from './DictView';
 
 export class DictSuggestModal extends SuggestModal<SearchResult> {
-	plugin: MdtermPlugin;
+	plugin: EzdictPlugin;
 	private initialQuery: string;
 
-	constructor(app: App, plugin: MdtermPlugin, initialQuery: string = '') {
+	constructor(app: App, plugin: EzdictPlugin, initialQuery: string = '') {
 		super(app);
 		this.plugin = plugin;
 		this.initialQuery = initialQuery;
@@ -29,14 +29,14 @@ export class DictSuggestModal extends SuggestModal<SearchResult> {
 	}
 
 	renderSuggestion(item: SearchResult, el: HTMLElement): void {
-		el.addClass('mdterm-modal-suggest-item');
+		el.addClass('ezdict-modal-suggest-item');
 		
-		const headerEl = el.createDiv({ cls: 'mdterm-modal-suggest-header' });
-		headerEl.createSpan({ cls: 'mdterm-modal-suggest-title', text: item.headword });
-		headerEl.createSpan({ cls: 'mdterm-modal-suggest-dict', text: `📖 ${item.fileName}` });
+		const headerEl = el.createDiv({ cls: 'ezdict-modal-suggest-header' });
+		headerEl.createSpan({ cls: 'ezdict-modal-suggest-title', text: item.headword });
+		headerEl.createSpan({ cls: 'ezdict-modal-suggest-dict', text: `📖 ${item.fileName}` });
 
 		if (item.snippet) {
-			const snippetEl = el.createDiv({ cls: 'mdterm-modal-suggest-snippet' });
+			const snippetEl = el.createDiv({ cls: 'ezdict-modal-suggest-snippet' });
 			snippetEl.setText(item.snippet);
 		}
 	}
@@ -44,7 +44,7 @@ export class DictSuggestModal extends SuggestModal<SearchResult> {
 	async onChooseSuggestion(item: SearchResult, evt: MouseEvent | KeyboardEvent): Promise<void> {
 		// Open in right sidebar
 		await this.plugin.activateSidebarView();
-		const leaves = this.app.workspace.getLeavesOfType(MDTERM_VIEW_TYPE);
+		const leaves = this.app.workspace.getLeavesOfType(EZDICT_VIEW_TYPE);
 		if (leaves.length > 0) {
 			const view = leaves[0].view as DictView;
 			await view.openEntryDetail(item.fileId, item.entryId);

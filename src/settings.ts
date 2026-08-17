@@ -1,11 +1,11 @@
 import { App, PluginSettingTab, Setting } from 'obsidian';
-import type MdtermPlugin from './main';
+import type EzdictPlugin from './main';
 import { DictSearchMode } from './types';
 
-export class MdtermSettingTab extends PluginSettingTab {
-	plugin: MdtermPlugin;
+export class EzdictSettingTab extends PluginSettingTab {
+	plugin: EzdictPlugin;
 
-	constructor(app: App, plugin: MdtermPlugin) {
+	constructor(app: App, plugin: EzdictPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
@@ -14,7 +14,7 @@ export class MdtermSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		containerEl.createEl('h2', { text: 'mdterm' });
+		containerEl.createEl('h2', { text: 'Ezdict' });
 
 		// 1. Dictionary Directory Setting
 		new Setting(containerEl)
@@ -106,7 +106,7 @@ export class MdtermSettingTab extends PluginSettingTab {
 		// 6. Right-click context menu
 		new Setting(containerEl)
 			.setName('啟用編輯器右鍵選單劃詞即查')
-			.setDesc('選取文字後，右鍵選單顯示「在 mdterm 查詢」項目。')
+			.setDesc('選取文字後，右鍵選單顯示「在 Ezdict 查詢」項目。')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.enableSelectionMenu)
 				.onChange(async (value) => {

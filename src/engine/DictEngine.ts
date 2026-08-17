@@ -1,12 +1,12 @@
 import { App, FileSystemAdapter, Notice, TFile, TFolder } from 'obsidian';
-import { DictEntry, DictFileMetadata, DictSearchMode, MdtermSettings, SearchResult, SectionIndex } from '../types';
+import { DictEntry, DictFileMetadata, DictSearchMode, EzdictSettings, SearchResult, SectionIndex } from '../types';
 import { scanSections } from './SectionScanner';
 import { ByteReader } from './ByteReader';
 import { BigramIndex } from './BigramIndex';
 
 export class DictEngine {
 	private app: App;
-	private settings: MdtermSettings;
+	private settings: EzdictSettings;
 	private byteReader: ByteReader;
 
 	public files: DictFileMetadata[] = [];
@@ -18,7 +18,7 @@ export class DictEngine {
 
 	private listeners: ((ready: boolean) => void)[] = [];
 
-	constructor(app: App, settings: MdtermSettings) {
+	constructor(app: App, settings: EzdictSettings) {
 		this.app = app;
 		this.settings = settings;
 		this.byteReader = new ByteReader(app);
@@ -33,7 +33,7 @@ export class DictEngine {
 		this.listeners.forEach(cb => cb(ready));
 	}
 
-	public updateSettings(settings: MdtermSettings): void {
+	public updateSettings(settings: EzdictSettings): void {
 		this.settings = settings;
 	}
 
