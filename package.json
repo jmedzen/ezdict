@@ -1,6 +1,6 @@
 {
   "name": "mdterm",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "High-performance offline dictionary reader and lookup plugin for Obsidian, designed for massive markdown reference books and Buddhist sutra dictionaries.",
   "main": "main.js",
   "scripts": {
