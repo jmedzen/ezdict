@@ -1,4 +1,36 @@
-import { App, FileSystemAdapter } from 'obsidian';
+import { App, FileSystemAdapter, Platform } from 'obsidian';
+
+interface NodeFS {
+	open(path: string, flags: string, callback: (err: Error | null, fd: number) => void): void;
+	read(fd: number, buffer: Uint8Array, offset: number, length: number, position: number, callback: (err: Error | null, bytesRead: number, buffer: Uint8Array) => void): void;
+	close(fd: number, callback: (err: Error | null) => void): void;
+	promises: {
+		stat(path: string): Promise<{ mtimeMs: number; size: number }>;
+		readFile(path: string, encoding: string): Promise<string>;
+	};
+}
+
+interface NodePath {
+	isAbsolute(path: string): boolean;
+	join(...paths: string[]): string;
+}
+
+function getNodeModules(): { fs: NodeFS; pathModule: NodePath } | null {
+	if (!Platform.isDesktop) return null;
+	try {
+		const nodeRequire = (window as unknown as { require?: (id: string) => unknown }).require;
+		if (typeof nodeRequire === 'function') {
+			const fs = nodeRequire('fs') as NodeFS;
+			const pathModule = nodeRequire('path') as NodePath;
+			if (fs && pathModule) {
+				return { fs, pathModule };
+			}
+		}
+	} catch {
+		return null;
+	}
+	return null;
+}
 
 /**
  * Ultra-fast byte-range slice reader.
@@ -34,27 +66,25 @@ export class ByteReader {
 		if (length <= 0) return '';
 
 		// 1. Desktop: Direct native Node.js fs.read slice (fastest, never loads full file into memory)
-		if (typeof window !== 'undefined' && (window as any).require) {
+		const node = getNodeModules();
+		if (node) {
 			try {
-				const fs = (window as any).require('fs');
-				const pathModule = (window as any).require('path');
 				let fullPath = filePath;
-
-				if (!pathModule.isAbsolute(filePath)) {
+				if (!node.pathModule.isAbsolute(filePath)) {
 					const adapter = this.app.vault.adapter;
 					if (adapter instanceof FileSystemAdapter) {
-						fullPath = pathModule.join(adapter.getBasePath(), filePath);
+						fullPath = node.pathModule.join(adapter.getBasePath(), filePath);
 					}
 				}
 
 				return await new Promise<string>((resolve, reject) => {
-					fs.open(fullPath, 'r', (err: any, fd: number) => {
-						if (err) return reject(err);
-						const buffer = Buffer.alloc(length);
-						fs.read(fd, buffer, 0, length, offset, (readErr: any, bytesRead: number) => {
-							fs.close(fd, () => {});
-							if (readErr) return reject(readErr);
-							resolve(buffer.toString('utf-8', 0, bytesRead));
+					node.fs.open(fullPath, 'r', (err, fd) => {
+						if (err) return reject(err instanceof Error ? err : new Error(String(err)));
+						const buffer = new Uint8Array(length);
+						node.fs.read(fd, buffer, 0, length, offset, (readErr, bytesRead) => {
+							node.fs.close(fd, () => {});
+							if (readErr) return reject(readErr instanceof Error ? readErr : new Error(String(readErr)));
+							resolve(this.textDecoder.decode(buffer.subarray(0, bytesRead)));
 						});
 					});
 				});
@@ -73,7 +103,6 @@ export class ByteReader {
 				const buffer = await this.app.vault.adapter.readBinary(normalizedPath);
 				cached = { mtime: stat?.mtime || 0, buffer };
 
-				// Keep at most 3 dictionary buffers in cache to prevent mobile memory pressure
 				if (this.mobileBufferCache.size >= 3) {
 					const firstKey = this.mobileBufferCache.keys().next().value;
 					if (firstKey) this.mobileBufferCache.delete(firstKey);
@@ -85,7 +114,7 @@ export class ByteReader {
 			return this.textDecoder.decode(slice);
 		} catch (adapterErr) {
 			console.error('[Ezdict] Failed to read slice via adapter:', adapterErr);
-			throw adapterErr;
+			throw (adapterErr instanceof Error ? adapterErr : new Error(String(adapterErr)));
 		}
 	}
 
@@ -95,29 +124,29 @@ export class ByteReader {
 	async readFullText(filePath: string): Promise<string> {
 		const normalizedPath = filePath.replace(/\\/g, '/');
 
-		if (typeof window !== 'undefined' && (window as any).require) {
+		const node = getNodeModules();
+		if (node) {
 			try {
-				const fs = (window as any).require('fs');
-				const pathModule = (window as any).require('path');
 				let fullPath = filePath;
-
-				if (!pathModule.isAbsolute(filePath)) {
+				if (!node.pathModule.isAbsolute(filePath)) {
 					const adapter = this.app.vault.adapter;
 					if (adapter instanceof FileSystemAdapter) {
-						fullPath = pathModule.join(adapter.getBasePath(), filePath);
+						fullPath = node.pathModule.join(adapter.getBasePath(), filePath);
 					}
 				}
 
-				const stat = await fs.promises.stat(fullPath);
+				const stat = await node.fs.promises.stat(fullPath);
 				const cached = this.textCache.get(normalizedPath);
 				if (cached && cached.mtime === stat.mtimeMs) {
 					return cached.text;
 				}
 
-				const text = await fs.promises.readFile(fullPath, 'utf-8');
+				const text = await node.fs.promises.readFile(fullPath, 'utf-8');
 				this.textCache.set(normalizedPath, { mtime: stat.mtimeMs, text });
 				return text;
-			} catch (_) {}
+			} catch {
+				// Fallback to vault adapter
+			}
 		}
 
 		// Mobile environment
@@ -135,7 +164,7 @@ export class ByteReader {
 			}
 			this.textCache.set(normalizedPath, { mtime: stat?.mtime || 0, text });
 			return text;
-		} catch (e) {
+		} catch {
 			return await this.app.vault.adapter.read(normalizedPath);
 		}
 	}

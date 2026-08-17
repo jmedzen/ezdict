@@ -1,4 +1,4 @@
-import { Plugin, WorkspaceLeaf, Editor, MarkdownView, Menu, Notice } from 'obsidian';
+import { Plugin, WorkspaceLeaf, Editor, Menu, Notice } from 'obsidian';
 import { DEFAULT_SETTINGS, EzdictSettings, SectionIndex } from './types';
 import { DictEngine } from './engine/DictEngine';
 import { EzdictSettingTab } from './settings';
@@ -22,16 +22,16 @@ export default class EzdictPlugin extends Plugin {
 		);
 
 		// Add Ribbon Icon in left bar
-		this.addRibbonIcon('book-open', 'Ezdict', async () => {
-			await this.activateSidebarView();
+		this.addRibbonIcon('book-open', 'Ezdict', () => {
+			void this.activateSidebarView();
 		});
 
-		// Register Command: Open Sidebar View
+		// Register Command: Open Sidebar View (ID without plugin prefix per guidelines)
 		this.addCommand({
-			id: 'open-ezdict-sidebar',
+			id: 'open-sidebar',
 			name: 'show md dictionary panel',
-			callback: async () => {
-				await this.activateSidebarView();
+			callback: () => {
+				void this.activateSidebarView();
 			}
 		});
 
@@ -52,13 +52,13 @@ export default class EzdictPlugin extends Plugin {
 		this.addCommand({
 			id: 'lookup-selection-in-sidebar',
 			name: 'search selection in dictionary panel',
-			editorCallback: async (editor: Editor) => {
+			editorCallback: (editor: Editor) => {
 				const selection = editor.getSelection().trim();
 				if (!selection) {
 					new Notice('請先選取要查詢的文字');
 					return;
 				}
-				await this.searchInSidebar(selection);
+				void this.searchInSidebar(selection);
 			}
 		});
 
@@ -73,8 +73,8 @@ export default class EzdictPlugin extends Plugin {
 						item
 							.setTitle(`在 Ezdict 查詢「${preview}」`)
 							.setIcon('book-open')
-							.onClick(async () => {
-								await this.searchInSidebar(selection);
+							.onClick(() => {
+								void this.searchInSidebar(selection);
 							});
 					});
 				}
@@ -85,15 +85,17 @@ export default class EzdictPlugin extends Plugin {
 		this.addSettingTab(new EzdictSettingTab(this.app, this));
 
 		// Load Cache and initialize engine in background
-		this.app.workspace.onLayoutReady(async () => {
-			const cache = await this.loadIndexCache();
-			await this.engine.initialize(cache);
-			await this.saveIndexCache();
+		this.app.workspace.onLayoutReady(() => {
+			void (async () => {
+				const cache = await this.loadIndexCache();
+				await this.engine.initialize(cache);
+				await this.saveIndexCache();
+			})();
 		});
 	}
 
 	onunload(): void {
-		this.app.workspace.detachLeavesOfType(EZDICT_VIEW_TYPE);
+		// Do not detach leaves in onunload to preserve user layout
 	}
 
 	async activateSidebarView(): Promise<WorkspaceLeaf> {
@@ -112,7 +114,7 @@ export default class EzdictPlugin extends Plugin {
 		}
 
 		if (leaf) {
-			workspace.revealLeaf(leaf);
+			await workspace.revealLeaf(leaf);
 		}
 		return leaf;
 	}
@@ -125,7 +127,8 @@ export default class EzdictPlugin extends Plugin {
 	}
 
 	async loadSettings(): Promise<void> {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		const loaded = await this.loadData() as Partial<EzdictSettings> | null;
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, loaded);
 	}
 
 	async saveSettings(): Promise<void> {
@@ -137,20 +140,23 @@ export default class EzdictPlugin extends Plugin {
 
 	async loadIndexCache(): Promise<Record<string, SectionIndex> | undefined> {
 		try {
-			const data = await this.loadData();
-			return data?._indexCache;
-		} catch (e) {
+			const data = await this.loadData() as Record<string, unknown> | null;
+			if (data && typeof data === 'object' && '_indexCache' in data) {
+				return data._indexCache as Record<string, SectionIndex>;
+			}
+			return undefined;
+		} catch {
 			return undefined;
 		}
 	}
 
 	async saveIndexCache(): Promise<void> {
 		try {
-			const current = await this.loadData() || {};
+			const current = (await this.loadData() as Record<string, unknown> | null) ?? {};
 			current._indexCache = this.engine.getCacheData();
 			await this.saveData(current);
-		} catch (e) {
-			console.warn('[Ezdict] Failed to save index cache:', e);
+		} catch (err) {
+			console.warn('[Ezdict] Failed to save index cache:', err);
 		}
 	}
 }

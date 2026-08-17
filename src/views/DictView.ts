@@ -9,7 +9,7 @@ export class DictView extends ItemView {
 	private currentMode: DictSearchMode = 'prefix';
 	private currentQuery: string = '';
 	private activeEntry: { fileId: number; entryId: number } | null = null;
-	private searchDebounceTimer: any = null;
+	private searchDebounceTimer: number | null = null;
 	private searchCache: Map<DictSearchMode, { query: string; results: SearchResult[] }> = new Map();
 	private entryHistory: { fileId: number; entryId: number }[] = [];
 
@@ -50,7 +50,7 @@ export class DictView extends ItemView {
 			if (ready) {
 				this.renderDictListDrawer();
 				if (this.currentQuery) {
-					this.executeSearch(this.currentQuery);
+					void this.executeSearch(this.currentQuery);
 				}
 			}
 		});
@@ -77,9 +77,11 @@ export class DictView extends ItemView {
 				this.searchCache.clear();
 			}
 			this.currentQuery = val;
-			if (this.searchDebounceTimer) clearTimeout(this.searchDebounceTimer);
-			this.searchDebounceTimer = setTimeout(() => {
-				this.executeSearch(val);
+			if (this.searchDebounceTimer !== null) {
+				window.clearTimeout(this.searchDebounceTimer);
+			}
+			this.searchDebounceTimer = window.setTimeout(() => {
+				void this.executeSearch(val);
 			}, 80);
 		});
 
@@ -92,70 +94,69 @@ export class DictView extends ItemView {
 			this.searchInputEl.value = '';
 			this.currentQuery = '';
 			this.searchCache.clear();
-			this.executeSearch('');
+			void this.executeSearch('');
 			this.searchInputEl.focus();
 		});
 
 		// 2. Mode Selector Tabs
 		this.modeTabsEl = headerEl.createDiv({ cls: 'ezdict-mode-tabs' });
-		const modes: { id: DictSearchMode; label: string; icon: string }[] = [
-			{ id: 'prefix', label: '詞條', icon: 'book' },
-			{ id: 'fuzzy', label: '模糊', icon: 'search' },
-			{ id: 'fulltext', label: '全文', icon: 'file-text' }
+		this.renderModeTabs();
+
+		// 3. Dictionary Toggle & Drawer
+		const toggleHeaderEl = parent.createDiv({ cls: 'ezdict-dict-toggle-header' });
+		this.dictListToggleEl = toggleHeaderEl.createDiv({ cls: 'ezdict-dict-toggle-btn' });
+		const chevronSpan = this.dictListToggleEl.createSpan({ cls: 'ezdict-dict-chevron' });
+		setIcon(chevronSpan, 'chevron-right');
+		this.dictListToggleEl.createSpan({ cls: 'ezdict-dict-toggle-label', text: '📚 辭典選擇與排序' });
+
+		this.dictListDrawerEl = parent.createDiv({ cls: 'ezdict-dict-drawer collapsed' });
+
+		this.dictListToggleEl.addEventListener('click', () => {
+			const isOpen = this.dictListDrawerEl.hasClass('collapsed');
+			if (isOpen) {
+				this.dictListDrawerEl.removeClass('collapsed');
+				this.dictListToggleEl.addClass('open');
+			} else {
+				this.dictListDrawerEl.addClass('collapsed');
+				this.dictListToggleEl.removeClass('open');
+			}
+		});
+
+		// 4. Results List Container
+		this.resultsContainerEl = parent.createDiv({ cls: 'ezdict-results-container' });
+
+		// 5. Entry Detail View Container (Hidden initially)
+		this.entryDetailContainerEl = parent.createDiv({ cls: 'ezdict-entry-detail-container hidden' });
+
+		// Initial Placeholder
+		this.renderPlaceholder('輸入關鍵字開始查詢辭典…');
+	}
+
+	private renderModeTabs(): void {
+		this.modeTabsEl.empty();
+
+		const modes: { key: DictSearchMode; label: string }[] = [
+			{ key: 'prefix', label: '詞條' },
+			{ key: 'fuzzy', label: '模糊' },
+			{ key: 'fulltext', label: '全文' }
 		];
 
 		modes.forEach(m => {
 			const tab = this.modeTabsEl.createEl('button', {
-				cls: `ezdict-mode-tab ${this.currentMode === m.id ? 'active' : ''}`,
+				cls: `ezdict-mode-tab ${this.currentMode === m.key ? 'active' : ''}`,
 				text: m.label
 			});
 			tab.addEventListener('click', () => {
-				if (this.currentMode === m.id) return;
-				this.currentMode = m.id;
-				this.modeTabsEl.querySelectorAll('.ezdict-mode-tab').forEach(el => el.removeClass('active'));
-				tab.addClass('active');
-
-				const q = this.currentQuery.trim();
-				if (!q) {
-					this.renderPlaceholder('📖 輸入關鍵詞開始查詢');
-					return;
-				}
-
-				// Check if we have cached results for this mode with the SAME query
-				const cached = this.searchCache.get(m.id);
-				if (cached && cached.query === q) {
-					this.showResultsView();
-					this.renderSearchResults(cached.results, q);
-				} else {
-					this.executeSearch(this.currentQuery);
+				if (this.currentMode !== m.key) {
+					this.currentMode = m.key;
+					this.renderModeTabs();
+					void this.executeSearch(this.currentQuery);
 				}
 			});
 		});
-
-		// 3. Dictionary Toggle & Selection Drawer
-		const dictToggleHeader = headerEl.createDiv({ cls: 'ezdict-dict-toggle-header' });
-		this.dictListToggleEl = dictToggleHeader.createDiv({ cls: 'ezdict-dict-toggle-btn' });
-		const chevronIcon = this.dictListToggleEl.createSpan({ cls: 'ezdict-dict-chevron' });
-		setIcon(chevronIcon, 'chevron-right');
-		this.dictListToggleEl.createSpan({ text: '📚 辭典選擇與排序', cls: 'ezdict-dict-toggle-label' });
-
-		this.dictListDrawerEl = headerEl.createDiv({ cls: 'ezdict-dict-drawer collapsed' });
-
-		this.dictListToggleEl.addEventListener('click', () => {
-			const isCollapsed = this.dictListDrawerEl.hasClass('collapsed');
-			this.dictListDrawerEl.toggleClass('collapsed', !isCollapsed);
-			this.dictListToggleEl.toggleClass('open', isCollapsed);
-		});
-
-		// 4. Main Body: Results and Entry Detail
-		const bodyEl = parent.createDiv({ cls: 'ezdict-body' });
-		this.resultsContainerEl = bodyEl.createDiv({ cls: 'ezdict-results-container' });
-		this.entryDetailContainerEl = bodyEl.createDiv({ cls: 'ezdict-entry-detail-container hidden' });
-
-		this.renderPlaceholder('📖 輸入關鍵詞開始查詢');
 	}
 
-	private renderDictListDrawer(): void {
+	public renderDictListDrawer(): void {
 		this.dictListDrawerEl.empty();
 		const files = this.plugin.engine.files;
 
@@ -166,14 +167,16 @@ export class DictView extends ItemView {
 
 		const actionsEl = this.dictListDrawerEl.createDiv({ cls: 'ezdict-drawer-actions' });
 		const allBtn = actionsEl.createEl('button', { cls: 'ezdict-drawer-action-btn', text: '切換全選' });
-		allBtn.addEventListener('click', async () => {
-			const allOn = files.every(f => f.enabled);
-			files.forEach(f => f.enabled = !allOn);
-			this.plugin.settings.disabledDicts = files.filter(f => !f.enabled).map(f => f.path);
-			this.searchCache.clear();
-			await this.plugin.saveSettings();
-			this.renderDictListDrawer();
-			this.executeSearch(this.currentQuery);
+		allBtn.addEventListener('click', () => {
+			void (async () => {
+				const allOn = files.every(f => f.enabled);
+				files.forEach(f => f.enabled = !allOn);
+				this.plugin.settings.disabledDicts = files.filter(f => !f.enabled).map(f => f.path);
+				this.searchCache.clear();
+				await this.plugin.saveSettings();
+				this.renderDictListDrawer();
+				void this.executeSearch(this.currentQuery);
+			})();
 		});
 
 		const listEl = this.dictListDrawerEl.createDiv({ cls: 'ezdict-drawer-list' });
@@ -184,16 +187,18 @@ export class DictView extends ItemView {
 			// Checkbox
 			const cb = itemEl.createEl('input', { type: 'checkbox' });
 			cb.checked = f.enabled;
-			cb.addEventListener('change', async (e) => {
-				f.enabled = (e.target as HTMLInputElement).checked;
-				this.plugin.settings.disabledDicts = files.filter(file => !file.enabled).map(file => file.path);
-				this.searchCache.clear();
-				await this.plugin.saveSettings();
-				this.executeSearch(this.currentQuery);
+			cb.addEventListener('change', (e) => {
+				void (async () => {
+					f.enabled = (e.target as HTMLInputElement).checked;
+					this.plugin.settings.disabledDicts = files.filter(file => !file.enabled).map(file => file.path);
+					this.searchCache.clear();
+					await this.plugin.saveSettings();
+					void this.executeSearch(this.currentQuery);
+				})();
 			});
 
 			// Title & Count
-			const nameEl = itemEl.createSpan({ cls: 'ezdict-drawer-item-name', text: f.name });
+			itemEl.createSpan({ cls: 'ezdict-drawer-item-name', text: f.name });
 			itemEl.createSpan({ cls: 'ezdict-drawer-item-count', text: `${f.entryCount.toLocaleString()} 條` });
 
 			// Up/Down Sort buttons
@@ -201,33 +206,37 @@ export class DictView extends ItemView {
 			const upBtn = sortBtnsEl.createEl('button', { cls: 'ezdict-drawer-sort-btn', attr: { title: '上移' } });
 			setIcon(upBtn, 'arrow-up');
 			upBtn.disabled = (idx === 0);
-			upBtn.addEventListener('click', async () => {
-				if (idx > 0) {
-					const temp = files[idx - 1];
-					files[idx - 1] = files[idx];
-					files[idx] = temp;
-					this.plugin.settings.dictFileOrder = files.map(file => file.path);
-					this.searchCache.clear();
-					await this.plugin.saveSettings();
-					this.renderDictListDrawer();
-					this.executeSearch(this.currentQuery);
-				}
+			upBtn.addEventListener('click', () => {
+				void (async () => {
+					if (idx > 0) {
+						const temp = files[idx - 1];
+						files[idx - 1] = files[idx];
+						files[idx] = temp;
+						this.plugin.settings.dictFileOrder = files.map(file => file.path);
+						this.searchCache.clear();
+						await this.plugin.saveSettings();
+						this.renderDictListDrawer();
+						void this.executeSearch(this.currentQuery);
+					}
+				})();
 			});
 
 			const downBtn = sortBtnsEl.createEl('button', { cls: 'ezdict-drawer-sort-btn', attr: { title: '下移' } });
 			setIcon(downBtn, 'arrow-down');
 			downBtn.disabled = (idx === files.length - 1);
-			downBtn.addEventListener('click', async () => {
-				if (idx < files.length - 1) {
-					const temp = files[idx + 1];
-					files[idx + 1] = files[idx];
-					files[idx] = temp;
-					this.plugin.settings.dictFileOrder = files.map(file => file.path);
-					this.searchCache.clear();
-					await this.plugin.saveSettings();
-					this.renderDictListDrawer();
-					this.executeSearch(this.currentQuery);
-				}
+			downBtn.addEventListener('click', () => {
+				void (async () => {
+					if (idx < files.length - 1) {
+						const temp = files[idx + 1];
+						files[idx + 1] = files[idx];
+						files[idx] = temp;
+						this.plugin.settings.dictFileOrder = files.map(file => file.path);
+						this.searchCache.clear();
+						await this.plugin.saveSettings();
+						this.renderDictListDrawer();
+						void this.executeSearch(this.currentQuery);
+					}
+				})();
 			});
 		});
 	}
@@ -238,117 +247,103 @@ export class DictView extends ItemView {
 		ph.createSpan({ cls: 'ezdict-placeholder-text', text });
 	}
 
-	public async searchExternal(query: string, mode?: DictSearchMode): Promise<void> {
+	public async executeSearch(query: string): Promise<void> {
 		this.showResultsView();
-		this.searchInputEl.value = query;
-		if (query.trim() !== this.currentQuery.trim()) {
-			this.searchCache.clear();
-		}
-		this.currentQuery = query;
-		if (mode) {
-			this.currentMode = mode;
-			this.modeTabsEl.querySelectorAll('.ezdict-mode-tab').forEach(el => {
-				el.toggleClass('active', el.textContent?.includes(mode));
-			});
-		}
-		await this.executeSearch(query);
-	}
-
-	private async executeSearch(query: string): Promise<void> {
 		const q = query.trim();
+
 		if (!q) {
-			this.renderPlaceholder('📖 輸入關鍵詞開始查詢');
+			this.renderPlaceholder('輸入關鍵字開始查詢辭典…');
 			return;
 		}
 
 		if (!this.plugin.engine.isReady) {
-			this.renderPlaceholder('⏳ 辭典載入中…');
+			this.renderPlaceholder('辭典載入索引中，請稍候…');
 			return;
 		}
 
-		// If this mode already has cached results for the EXACT same query, use them immediately
+		// Check mode cache
 		const cached = this.searchCache.get(this.currentMode);
 		if (cached && cached.query === q) {
-			this.showResultsView();
-			this.renderSearchResults(cached.results, q);
+			this.renderResults(cached.results, q);
 			return;
 		}
 
-		this.showResultsView();
+		// Perform Search
 		this.resultsContainerEl.empty();
-
 		const loadingEl = this.resultsContainerEl.createDiv({ cls: 'ezdict-loading-spinner' });
-		loadingEl.createSpan({ text: '搜尋中…' });
+		loadingEl.createSpan({ text: '檢索中…' });
 
 		try {
 			const results = await this.plugin.engine.search(q, this.currentMode);
 			this.searchCache.set(this.currentMode, { query: q, results });
-			this.renderSearchResults(results, q);
-		} catch (err) {
-			this.resultsContainerEl.empty();
-			this.renderPlaceholder('⚠️ 搜尋發生錯誤');
+			this.renderResults(results, q);
+		} catch {
+			this.renderPlaceholder('⚠️ 搜尋時發生錯誤');
 		}
 	}
 
-	private renderSearchResults(results: SearchResult[], query: string): void {
+	private renderResults(results: SearchResult[], query: string): void {
 		this.resultsContainerEl.empty();
 
 		if (results.length === 0) {
-			this.renderPlaceholder(`🔍 未找到符合「${query}」的詞條`);
+			this.renderPlaceholder(`未找到與「${query}」相關的詞條`);
 			return;
 		}
 
-		const statusEl = this.resultsContainerEl.createDiv({ cls: 'ezdict-results-status' });
-		statusEl.createSpan({ text: `找到 ${results.length} 筆結果` });
+		// Result Header Count
+		const countHeaderEl = this.resultsContainerEl.createDiv({ cls: 'ezdict-results-count-bar' });
+		countHeaderEl.setText(`找到 ${results.length.toLocaleString()} 筆結果`);
 
-		// Group results by dictionary file
-		const groups = new Map<number, { name: string; items: SearchResult[] }>();
+		// Group results by Dictionary file
+		const grouped: Map<number, SearchResult[]> = new Map();
 		results.forEach(r => {
-			if (!groups.has(r.fileId)) {
-				groups.set(r.fileId, { name: r.fileName, items: [] });
-			}
-			groups.get(r.fileId)!.items.push(r);
+			if (!grouped.has(r.fileId)) grouped.set(r.fileId, []);
+			grouped.get(r.fileId)!.push(r);
 		});
 
-		groups.forEach((group) => {
+		grouped.forEach((items, fileId) => {
+			const fileName = items[0].fileName;
 			const groupEl = this.resultsContainerEl.createDiv({ cls: 'ezdict-result-group' });
 
-			const groupHeaderEl = groupEl.createDiv({ cls: 'ezdict-result-group-header' });
-			groupHeaderEl.createSpan({ cls: 'ezdict-result-group-title', text: `📖 ${group.name}` });
-			groupHeaderEl.createSpan({ cls: 'ezdict-result-group-badge', text: `${group.items.length}` });
+			const groupTitleEl = groupEl.createDiv({ cls: 'ezdict-result-group-title' });
+			groupTitleEl.createSpan({ cls: 'ezdict-result-group-name', text: `📖 ${fileName}` });
+			groupTitleEl.createSpan({ cls: 'ezdict-result-group-badge', text: `${items.length}` });
 
-			groupHeaderEl.addEventListener('click', () => {
-				groupEl.toggleClass('collapsed', !groupEl.hasClass('collapsed'));
-			});
+			const itemsContainerEl = groupEl.createDiv({ cls: 'ezdict-result-group-items' });
 
-			const listEl = groupEl.createDiv({ cls: 'ezdict-result-items-list' });
+			items.forEach(item => {
+				const itemEl = itemsContainerEl.createDiv({ cls: 'ezdict-result-item' });
 
-			group.items.forEach(item => {
-				const itemEl = listEl.createDiv({ cls: 'ezdict-result-item' });
-
-				const headwordEl = itemEl.createDiv({ cls: 'ezdict-result-headword' });
-				this.highlightText(headwordEl, item.headword, query);
+				const titleRowEl = itemEl.createDiv({ cls: 'ezdict-result-item-title-row' });
+				const titleSpan = titleRowEl.createSpan({ cls: 'ezdict-result-item-title' });
+				this.renderHighlightedText(titleSpan, item.headword, query);
 
 				if (item.snippet) {
-					const snippetEl = itemEl.createDiv({ cls: 'ezdict-result-snippet' });
-					this.highlightText(snippetEl, item.snippet, query);
+					const snippetEl = itemEl.createDiv({ cls: 'ezdict-result-item-snippet' });
+					this.renderHighlightedText(snippetEl, item.snippet, query);
 				}
 
 				itemEl.addEventListener('click', () => {
-					this.entryHistory = [];
-					this.openEntryDetail(item.fileId, item.entryId, false);
+					void this.openEntryDetail(item.fileId, item.entryId);
 				});
 			});
 		});
 	}
 
-	private highlightText(parent: HTMLElement, text: string, query: string): void {
-		if (!query) {
+	private renderHighlightedText(parent: HTMLElement, text: string, query: string): void {
+		if (!query.trim()) {
 			parent.setText(text);
 			return;
 		}
-		const terms = query.trim().split(/\s+/).filter(Boolean);
-		const regex = new RegExp(`(${terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'gi');
+
+		const terms = query.split(/\s+/).filter(Boolean);
+		if (terms.length === 0) {
+			parent.setText(text);
+			return;
+		}
+
+		const escaped = terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+		const regex = new RegExp(`(${escaped})`, 'gi');
 		const parts = text.split(regex);
 
 		parts.forEach(part => {
@@ -395,7 +390,7 @@ export class DictView extends ItemView {
 			this.showResultsView();
 		});
 
-		const dictTagEl = navHeaderEl.createSpan({ cls: 'ezdict-detail-dict-tag', text: `📖 ${result.file.name}` });
+		navHeaderEl.createSpan({ cls: 'ezdict-detail-dict-tag', text: `📖 ${result.file.name}` });
 
 		// Actions (Copy / Insert into note)
 		const actionsEl = navHeaderEl.createDiv({ cls: 'ezdict-detail-actions' });
@@ -407,8 +402,10 @@ export class DictView extends ItemView {
 		const copyBtn = actionsEl.createEl('button', { cls: 'ezdict-action-icon-btn', attr: { title: '複製內文' } });
 		setIcon(copyBtn, 'copy');
 		copyBtn.addEventListener('click', () => {
-			navigator.clipboard.writeText(result.content);
-			new Notice('✅ 已複製辭典內文');
+			void (async () => {
+				await navigator.clipboard.writeText(result.content);
+				new Notice('✅ 已複製辭典內文');
+			})();
 		});
 
 		// Detail Content Area
@@ -420,45 +417,42 @@ export class DictView extends ItemView {
 		await MarkdownRenderer.render(this.app, result.content, contentEl, '', comp);
 
 		// Intercept internal link clicks within dictionary reading area
-		contentEl.addEventListener('click', async (e: MouseEvent) => {
-			const target = e.target as HTMLElement;
-			const linkEl = target.closest('a');
-			if (!linkEl) return;
+		contentEl.addEventListener('click', (e: MouseEvent) => {
+			void (async () => {
+				const target = e.target as HTMLElement;
+				const linkEl = target.closest('a');
+				if (!linkEl) return;
 
-			const href = linkEl.getAttribute('data-href') || linkEl.getAttribute('href');
-			if (!href) return;
+				const href = linkEl.getAttribute('data-href') || linkEl.getAttribute('href');
+				if (!href) return;
 
-			// Skip external web links
-			if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('mailto:')) {
-				return;
-			}
+				// Skip external web links
+				if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('mailto:')) {
+					return;
+				}
 
-			e.preventDefault();
-			e.stopPropagation();
+				e.preventDefault();
+				e.stopPropagation();
 
-			// Clean target headword from internal link (e.g. "[[唯識]]", "法相辭典#阿賴耶識", "#阿賴耶識", "唯識.md")
-			let targetText = href.replace(/^#/, '').replace(/\.md$/i, '').trim();
-			if (targetText.includes('#')) {
-				targetText = targetText.split('#')[1].trim();
-			}
-			targetText = targetText.replace(/^【/, '').replace(/】$/, '').trim();
-			if (!targetText) return;
+				let targetText = href.replace(/^#/, '').replace(/\.md$/i, '').trim();
+				if (targetText.includes('#')) {
+					targetText = targetText.split('#')[1].trim();
+				}
+				targetText = targetText.replace(/^【/, '').replace(/】$/, '').trim();
+				if (!targetText) return;
 
-			// 1. Look in the CURRENT active dictionary first
-			let found = this.plugin.engine.findEntryByHeadword(fileId, targetText);
+				let found = this.plugin.engine.findEntryByHeadword(fileId, targetText);
+				if (!found) {
+					found = this.plugin.engine.findEntryInAnyDict(targetText);
+				}
 
-			// 2. If not found in current dict, look across all other active dicts
-			if (!found) {
-				found = this.plugin.engine.findEntryInAnyDict(targetText);
-			}
-
-			if (found) {
-				await this.openEntryDetail(found.fileId, found.entry.id, true);
-			} else {
-				// Search in Ezdict if no exact match
-				new Notice(`🔍 辭典中未找到完全相符的詞條「${targetText}」，改為搜尋…`);
-				await this.searchExternal(targetText);
-			}
+				if (found) {
+					await this.openEntryDetail(found.fileId, found.entry.id, true);
+				} else {
+					new Notice(`🔍 辭典中未找到完全相符的詞條「${targetText}」，改為搜尋…`);
+					await this.searchExternal(targetText);
+				}
+			})();
 		});
 
 		// Bottom Prev/Next Pagination Bar
@@ -476,7 +470,9 @@ export class DictView extends ItemView {
 		});
 		prevBtn.disabled = !prevEntry;
 		if (prevEntry) {
-			prevBtn.addEventListener('click', () => this.openEntryDetail(fileId, prevEntry.id, true));
+			prevBtn.addEventListener('click', () => {
+				void this.openEntryDetail(fileId, prevEntry.id, true);
+			});
 		}
 
 		const nextEntry = this.plugin.engine.getAdjacentEntry(fileId, entryId, 1);
@@ -491,7 +487,9 @@ export class DictView extends ItemView {
 		nextBtn.createSpan({ cls: 'ezdict-pagination-arrow', text: '→' });
 		nextBtn.disabled = !nextEntry;
 		if (nextEntry) {
-			nextBtn.addEventListener('click', () => this.openEntryDetail(fileId, nextEntry.id, true));
+			nextBtn.addEventListener('click', () => {
+				void this.openEntryDetail(fileId, nextEntry.id, true);
+			});
 		}
 	}
 
@@ -511,7 +509,6 @@ export class DictView extends ItemView {
 			insertText = `\n### 《${file.name}》【${entry.cleanHeadword}】\n${content.trim()}\n\n`;
 		}
 
-		// Find the active or most recent Markdown editor
 		let targetEditor: Editor | null = null;
 
 		// 1. Try active MarkdownView
@@ -533,8 +530,11 @@ export class DictView extends ItemView {
 		}
 
 		// 3. Try app.workspace.activeEditor
-		if (!targetEditor && (this.app.workspace as any).activeEditor?.editor) {
-			targetEditor = (this.app.workspace as any).activeEditor.editor;
+		if (!targetEditor) {
+			const activeWorkspace = this.app.workspace as unknown as { activeEditor?: { editor?: Editor } };
+			if (activeWorkspace.activeEditor?.editor) {
+				targetEditor = activeWorkspace.activeEditor.editor;
+			}
 		}
 
 		if (targetEditor) {
@@ -542,9 +542,10 @@ export class DictView extends ItemView {
 			targetEditor.replaceSelection(insertText);
 			new Notice(`✅ 已成功插入《${file.name}》【${entry.cleanHeadword}】`);
 		} else {
-			// If no editor is open, copy to clipboard and notify clearly
-			navigator.clipboard.writeText(insertText);
-			new Notice(`📋 目前未開啟任何筆記編輯器，已將引用複製至剪貼簿！`);
+			void (async () => {
+				await navigator.clipboard.writeText(insertText);
+				new Notice(`📋 目前未開啟任何筆記編輯器，已將引用複製至剪貼簿！`);
+			})();
 		}
 	}
 
@@ -556,6 +557,12 @@ export class DictView extends ItemView {
 	private showDetailView(): void {
 		this.resultsContainerEl.addClass('hidden');
 		this.entryDetailContainerEl.removeClass('hidden');
+	}
+
+	public async searchExternal(query: string): Promise<void> {
+		this.searchInputEl.value = query;
+		this.currentQuery = query;
+		await this.executeSearch(query);
 	}
 
 	async onClose(): Promise<void> {}

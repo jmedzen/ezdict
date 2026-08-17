@@ -1,8 +1,36 @@
-import { App, FileSystemAdapter, Notice, TFile, TFolder } from 'obsidian';
+import { App, FileSystemAdapter, Notice, Platform, TFile, TFolder } from 'obsidian';
 import { DictEntry, DictFileMetadata, DictSearchMode, EzdictSettings, SearchResult, SectionIndex } from '../types';
 import { scanSections } from './SectionScanner';
 import { ByteReader } from './ByteReader';
 import { BigramIndex } from './BigramIndex';
+
+interface NodeFSSync {
+	existsSync(path: string): boolean;
+	statSync(path: string): { isDirectory(): boolean; isFile(): boolean; size: number; mtimeMs: number };
+	readdirSync(path: string): string[];
+}
+
+interface NodePath {
+	isAbsolute(path: string): boolean;
+	join(...paths: string[]): string;
+}
+
+function getNodeSync(): { fs: NodeFSSync; pathModule: NodePath } | null {
+	if (!Platform.isDesktop) return null;
+	try {
+		const nodeRequire = (window as unknown as { require?: (id: string) => unknown }).require;
+		if (typeof nodeRequire === 'function') {
+			const fs = nodeRequire('fs') as NodeFSSync;
+			const pathModule = nodeRequire('path') as NodePath;
+			if (fs && pathModule) {
+				return { fs, pathModule };
+			}
+		}
+	} catch {
+		return null;
+	}
+	return null;
+}
 
 export class DictEngine {
 	private app: App;
@@ -124,25 +152,24 @@ export class DictEngine {
 		}
 
 		// 2. Check external absolute directory on Desktop Node.js environment
-		if (result.length === 0 && typeof window !== 'undefined' && (window as any).require) {
+		const node = getNodeSync();
+		if (result.length === 0 && node) {
 			try {
-				const fs = (window as any).require('fs');
-				const pathModule = (window as any).require('path');
 				let fullPath = dirPath;
 
-				if (!pathModule.isAbsolute(dirPath)) {
+				if (!node.pathModule.isAbsolute(dirPath)) {
 					const adapter = this.app.vault.adapter;
 					if (adapter instanceof FileSystemAdapter) {
-						fullPath = pathModule.join(adapter.getBasePath(), dirPath);
+						fullPath = node.pathModule.join(adapter.getBasePath(), dirPath);
 					}
 				}
 
-				if (fs.existsSync(fullPath) && fs.statSync(fullPath).isDirectory()) {
-					const items = fs.readdirSync(fullPath);
+				if (node.fs.existsSync(fullPath) && node.fs.statSync(fullPath).isDirectory()) {
+					const items = node.fs.readdirSync(fullPath);
 					for (const item of items) {
 						if (item.startsWith('.') || !item.toLowerCase().endsWith('.md')) continue;
-						const itemPath = pathModule.join(fullPath, item);
-						const stat = fs.statSync(itemPath);
+						const itemPath = node.pathModule.join(fullPath, item);
+						const stat = node.fs.statSync(itemPath);
 						if (stat.isFile()) {
 							const name = item.replace(/\.md$/i, '');
 							const enabled = !this.settings.disabledDicts.includes(itemPath);
@@ -161,8 +188,8 @@ export class DictEngine {
 						}
 					}
 				}
-			} catch (e) {
-				console.warn('[mdterm] External directory scan error:', e);
+			} catch (err) {
+				console.warn('[Ezdict] External directory scan error:', err);
 			}
 		}
 
@@ -372,7 +399,7 @@ export class DictEngine {
 	 */
 	getCacheData(): Record<string, SectionIndex> {
 		const cache: Record<string, SectionIndex> = {};
-		for (const [_, idx] of this.sectionIndexes.entries()) {
+		for (const idx of this.sectionIndexes.values()) {
 			cache[idx.path] = idx;
 		}
 		return cache;

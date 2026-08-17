@@ -1,4 +1,4 @@
-import { App, SuggestModal, MarkdownRenderer, Component } from 'obsidian';
+import { App, SuggestModal } from 'obsidian';
 import type EzdictPlugin from '../main';
 import { SearchResult } from '../types';
 import { EZDICT_VIEW_TYPE, DictView } from './DictView';
@@ -41,13 +41,14 @@ export class DictSuggestModal extends SuggestModal<SearchResult> {
 		}
 	}
 
-	async onChooseSuggestion(item: SearchResult, evt: MouseEvent | KeyboardEvent): Promise<void> {
-		// Open in right sidebar
-		await this.plugin.activateSidebarView();
-		const leaves = this.app.workspace.getLeavesOfType(EZDICT_VIEW_TYPE);
-		if (leaves.length > 0) {
-			const view = leaves[0].view as DictView;
-			await view.openEntryDetail(item.fileId, item.entryId);
-		}
+	onChooseSuggestion(item: SearchResult, _evt: MouseEvent | KeyboardEvent): void {
+		void (async () => {
+			await this.plugin.activateSidebarView();
+			const leaves = this.app.workspace.getLeavesOfType(EZDICT_VIEW_TYPE);
+			if (leaves.length > 0) {
+				const view = leaves[0].view as DictView;
+				await view.openEntryDetail(item.fileId, item.entryId);
+			}
+		})();
 	}
 }
