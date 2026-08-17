@@ -327,11 +327,12 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 7px 10px;
+	padding: 8px 10px;
 	background-color: var(--background-secondary-alt);
 	cursor: pointer;
 	user-select: none;
 	border-bottom: 1px solid var(--divider-color);
+	transition: background-color 0.15s ease;
 }
 
 .ezdict-result-group-header:hover,
@@ -339,21 +340,43 @@
 	background-color: var(--background-modifier-hover);
 }
 
+.ezdict-result-group-left,
+.mdterm-result-group-left {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	flex: 1;
+	min-width: 0;
+}
+
+.ezdict-result-group-chevron,
+.mdterm-result-group-chevron {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--text-muted);
+	flex-shrink: 0;
+}
+
 .ezdict-result-group-title,
 .mdterm-result-group-title {
-	font-size: calc(var(--font-text-size) * 0.95);
+	font-size: var(--font-ui-medium, calc(var(--font-text-size) * 0.95));
 	font-weight: 600;
 	color: var(--text-normal);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .ezdict-result-group-badge,
 .mdterm-result-group-badge {
-	font-size: calc(var(--font-text-size) * 0.75);
+	font-size: var(--font-ui-small, calc(var(--font-text-size) * 0.8));
 	font-weight: 500;
-	padding: 1px 6px;
+	padding: 2px 7px;
 	border-radius: 10px;
 	background-color: var(--background-modifier-border);
 	color: var(--text-muted);
+	flex-shrink: 0;
 }
 
 .ezdict-result-group.collapsed .ezdict-result-items-list,

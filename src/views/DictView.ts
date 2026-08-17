@@ -303,15 +303,34 @@ export class DictView extends ItemView {
 			grouped.get(r.fileId)!.push(r);
 		});
 
-		grouped.forEach((items, fileId) => {
+		grouped.forEach((items) => {
 			const fileName = items[0].fileName;
 			const groupEl = this.resultsContainerEl.createDiv({ cls: 'ezdict-result-group' });
 
-			const groupTitleEl = groupEl.createDiv({ cls: 'ezdict-result-group-title' });
-			groupTitleEl.createSpan({ cls: 'ezdict-result-group-name', text: `📖 ${fileName}` });
-			groupTitleEl.createSpan({ cls: 'ezdict-result-group-badge', text: `${items.length}` });
+			const groupHeaderEl = groupEl.createDiv({ cls: 'ezdict-result-group-header' });
+			
+			const leftWrapEl = groupHeaderEl.createDiv({ cls: 'ezdict-result-group-left' });
+			const chevronSpan = leftWrapEl.createSpan({ cls: 'ezdict-result-group-chevron' });
+			setIcon(chevronSpan, 'chevron-down');
+			leftWrapEl.createSpan({ cls: 'ezdict-result-group-title', text: `📖 ${fileName}` });
 
-			const itemsContainerEl = groupEl.createDiv({ cls: 'ezdict-result-group-items' });
+			groupHeaderEl.createSpan({ cls: 'ezdict-result-group-badge', text: `${items.length.toLocaleString()}` });
+
+			const itemsContainerEl = groupEl.createDiv({ cls: 'ezdict-result-items-list' });
+
+			// Click header to collapse / uncollapse
+			groupHeaderEl.addEventListener('click', () => {
+				const isCollapsed = groupEl.hasClass('collapsed');
+				if (isCollapsed) {
+					groupEl.removeClass('collapsed');
+					chevronSpan.empty();
+					setIcon(chevronSpan, 'chevron-down');
+				} else {
+					groupEl.addClass('collapsed');
+					chevronSpan.empty();
+					setIcon(chevronSpan, 'chevron-right');
+				}
+			});
 
 			items.forEach(item => {
 				const itemEl = itemsContainerEl.createDiv({ cls: 'ezdict-result-item' });
