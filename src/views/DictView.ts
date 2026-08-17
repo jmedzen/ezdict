@@ -475,9 +475,13 @@ export class DictView extends ItemView {
 
 		const prevEntry = this.plugin.engine.getAdjacentEntry(fileId, entryId, -1);
 		const prevBtn = paginationEl.createEl('button', {
-			cls: 'mdterm-pagination-btn',
-			text: prevEntry ? `← ${prevEntry.cleanHeadword}` : '← 第一條',
-			attr: { title: '前一條詞目' }
+			cls: 'mdterm-pagination-btn mdterm-pagination-btn-prev',
+			attr: { title: prevEntry ? `前一條: ${prevEntry.cleanHeadword}` : '已是第一條' }
+		});
+		prevBtn.createSpan({ cls: 'mdterm-pagination-arrow', text: '←' });
+		prevBtn.createSpan({
+			cls: 'mdterm-pagination-label',
+			text: prevEntry ? prevEntry.cleanHeadword : '第一條'
 		});
 		prevBtn.disabled = !prevEntry;
 		if (prevEntry) {
@@ -486,10 +490,14 @@ export class DictView extends ItemView {
 
 		const nextEntry = this.plugin.engine.getAdjacentEntry(fileId, entryId, 1);
 		const nextBtn = paginationEl.createEl('button', {
-			cls: 'mdterm-pagination-btn',
-			text: nextEntry ? `${nextEntry.cleanHeadword} →` : '最後一條 →',
-			attr: { title: '後一條詞目' }
+			cls: 'mdterm-pagination-btn mdterm-pagination-btn-next',
+			attr: { title: nextEntry ? `後一條: ${nextEntry.cleanHeadword}` : '已是最後一條' }
 		});
+		nextBtn.createSpan({
+			cls: 'mdterm-pagination-label',
+			text: nextEntry ? nextEntry.cleanHeadword : '最後一條'
+		});
+		nextBtn.createSpan({ cls: 'mdterm-pagination-arrow', text: '→' });
 		nextBtn.disabled = !nextEntry;
 		if (nextEntry) {
 			nextBtn.addEventListener('click', () => this.openEntryDetail(fileId, nextEntry.id, true));
