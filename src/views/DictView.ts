@@ -45,6 +45,7 @@ export class DictView extends ItemView {
 		container.addClass('ezdict-view-container');
 
 		this.buildUI(container);
+		this.renderDictListDrawer();
 
 		this.plugin.engine.onReady((ready) => {
 			if (ready) {
@@ -102,18 +103,19 @@ export class DictView extends ItemView {
 		this.modeTabsEl = headerEl.createDiv({ cls: 'ezdict-mode-tabs' });
 		this.renderModeTabs();
 
-		// 3. Dictionary Toggle & Drawer
-		const toggleHeaderEl = parent.createDiv({ cls: 'ezdict-dict-toggle-header' });
+		// 3. Dictionary Toggle & Drawer (inside header area)
+		const toggleHeaderEl = headerEl.createDiv({ cls: 'ezdict-dict-toggle-header' });
 		this.dictListToggleEl = toggleHeaderEl.createDiv({ cls: 'ezdict-dict-toggle-btn' });
 		const chevronSpan = this.dictListToggleEl.createSpan({ cls: 'ezdict-dict-chevron' });
 		setIcon(chevronSpan, 'chevron-right');
 		this.dictListToggleEl.createSpan({ cls: 'ezdict-dict-toggle-label', text: '📚 辭典選擇與排序' });
 
-		this.dictListDrawerEl = parent.createDiv({ cls: 'ezdict-dict-drawer collapsed' });
+		this.dictListDrawerEl = headerEl.createDiv({ cls: 'ezdict-dict-drawer collapsed' });
 
 		this.dictListToggleEl.addEventListener('click', () => {
-			const isOpen = this.dictListDrawerEl.hasClass('collapsed');
-			if (isOpen) {
+			const isCollapsed = this.dictListDrawerEl.hasClass('collapsed');
+			if (isCollapsed) {
+				this.renderDictListDrawer();
 				this.dictListDrawerEl.removeClass('collapsed');
 				this.dictListToggleEl.addClass('open');
 			} else {
