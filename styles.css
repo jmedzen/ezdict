@@ -62,8 +62,8 @@
 	background: transparent !important;
 	outline: none !important;
 	box-shadow: none !important;
-	padding: 5px 0 !important;
-	font-size: 13.5px;
+	padding: 6px 0 !important;
+	font-size: var(--font-ui-medium, var(--font-text-size));
 	color: var(--text-normal) !important;
 }
 
@@ -107,10 +107,10 @@
 	flex: 1;
 	border: none;
 	background: transparent;
-	font-size: 12px;
+	font-size: var(--font-ui-medium, calc(var(--font-text-size) * 0.95));
 	font-weight: 500;
 	color: var(--text-muted);
-	padding: 4px 6px;
+	padding: 6px 8px;
 	border-radius: var(--radius-s, 4px);
 	cursor: pointer;
 	transition: all 0.15s ease;
@@ -142,10 +142,10 @@
 	display: flex;
 	align-items: center;
 	gap: 6px;
-	font-size: 11.5px;
+	font-size: var(--font-ui-medium, calc(var(--font-text-size) * 0.95));
 	color: var(--text-muted);
 	cursor: pointer;
-	padding: 4px 6px;
+	padding: 6px 8px;
 	border-radius: var(--radius-s, 4px);
 	user-select: none;
 	width: 100%;
@@ -178,7 +178,7 @@
 	border: 1px solid var(--background-modifier-border);
 	border-radius: var(--radius-m, 6px);
 	padding: 8px;
-	max-height: 240px;
+	max-height: 280px;
 	overflow-y: auto;
 	transition: all 0.2s ease;
 }
@@ -192,14 +192,14 @@
 .mdterm-drawer-actions {
 	display: flex;
 	justify-content: flex-end;
-	padding-bottom: 4px;
+	padding-bottom: 6px;
 	border-bottom: 1px solid var(--divider-color);
 }
 
 .ezdict-drawer-action-btn,
 .mdterm-drawer-action-btn {
-	font-size: 11px;
-	padding: 2px 6px;
+	font-size: var(--font-ui-small, calc(var(--font-text-size) * 0.88));
+	padding: 4px 10px;
 	border: 1px solid var(--background-modifier-border);
 	border-radius: var(--radius-s, 4px);
 	background-color: var(--background-secondary);
@@ -217,7 +217,7 @@
 .mdterm-drawer-list {
 	display: flex;
 	flex-direction: column;
-	gap: 4px;
+	gap: 5px;
 }
 
 .ezdict-drawer-item,
@@ -225,7 +225,7 @@
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	padding: 4px 6px;
+	padding: 6px 8px;
 	border-radius: var(--radius-s, 4px);
 	background-color: var(--background-secondary-alt);
 }
@@ -233,17 +233,18 @@
 .ezdict-drawer-item-name,
 .mdterm-drawer-item-name {
 	flex: 1;
-	font-size: 12px;
+	font-size: var(--font-ui-medium, var(--font-text-size));
 	font-weight: 500;
 	color: var(--text-normal);
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	line-height: var(--line-height-normal, 1.5);
 }
 
 .ezdict-drawer-item-count,
 .mdterm-drawer-item-count {
-	font-size: 10.5px;
+	font-size: var(--font-ui-small, calc(var(--font-text-size) * 0.88));
 	color: var(--text-muted);
 }
 
