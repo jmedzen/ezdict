@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting } from 'obsidian';
+import { App, PluginSettingTab, Setting, SettingDefinitionItem } from 'obsidian';
 import type EzdictPlugin from './main';
 import { DictSearchMode } from './types';
 
@@ -10,6 +10,145 @@ export class EzdictSettingTab extends PluginSettingTab {
 		this.plugin = plugin;
 	}
 
+	/**
+	 * Declarative Setting Definitions for Obsidian 1.13.0+ and global Settings search.
+	 */
+	override getSettingDefinitions(): SettingDefinitionItem[] {
+		return [
+			{
+				type: 'group',
+				heading: '辭典目錄與索引 (Dictionaries & Index)',
+				items: [
+					{
+						name: '辭典目錄路徑 (Dictionary Path)',
+						desc: '存放 .md 辭典檔案的資料夾路徑。支援 Vault 內部相對路徑（如 dictionary_folder）或電腦上的絕對路徑。',
+						control: {
+							type: 'text',
+							key: 'dictDirectory',
+							placeholder: '例如: dictionary_folder 或 /Users/jm/dictionary_folder'
+						}
+					},
+					{
+						name: '詞條標題層級 (Entry Heading Level)',
+						desc: '定義 Markdown 中作為獨立詞條開頭的標題層級（預設為 h3 ###）。修改後將自動重新掃描辭典檔案並更新索引。',
+						control: {
+							type: 'dropdown',
+							key: 'entryHeadingLevel',
+							options: {
+								'2': 'h2 (## 標題二)',
+								'3': 'h3 (### 標題三 - 預設)',
+								'4': 'h4 (#### 標題四)',
+								'5': 'h5 (##### 標題五)',
+								'6': 'h6 (###### 標題六)',
+								'0': '自動偵測 (Auto-Detect 最深層級)'
+							}
+						}
+					},
+					{
+						name: '重新建立辭典索引',
+						desc: '當您新增或更新了辭典 .md 檔案後，點擊此按鈕立即重新掃描並更新快取。',
+						action: (el: HTMLElement) => {
+							const btn = el.querySelector('button') || el;
+							btn.setText('掃描中…');
+							void (async () => {
+								await this.plugin.engine.initialize();
+								await this.plugin.saveIndexCache();
+								btn.setText('✅ 掃描完成');
+								window.setTimeout(() => btn.setText('🔄 立即重新掃描索引'), 2500);
+							})();
+						}
+					}
+				]
+			},
+			{
+				type: 'group',
+				heading: '搜尋與引用 (Search & Citation)',
+				items: [
+					{
+						name: '預設搜尋模式 (Default Search Mode)',
+						desc: '開啟面板或進行查詢時的預設模式。',
+						control: {
+							type: 'dropdown',
+							key: 'defaultMode',
+							options: {
+								'prefix': '📖 詞條前綴 (Prefix - 0延遲)',
+								'fuzzy': '🔍 詞條模糊 (Fuzzy - 包含子字串)',
+								'fulltext': '📑 內文全文 (Full-Text - 內文檢索)'
+							}
+						}
+					},
+					{
+						name: '每本辭典最大搜尋筆數',
+						desc: '限制每本辭典回傳之最大結果數量（預設 350 筆）。',
+						control: {
+							type: 'slider',
+							key: 'maxResultsPerDict',
+							min: 20,
+							max: 1000,
+							step: 10
+						}
+					},
+					{
+						name: '搜尋鄰近詞距上限 (Proximity Distance)',
+						desc: '全文檢索多關鍵詞 (AND 查詢) 時允許的最大字元距離。',
+						control: {
+							type: 'slider',
+							key: 'maxProximityDistance',
+							min: 20,
+							max: 500,
+							step: 10
+						}
+					},
+					{
+						name: '一鍵引用插入格式 (Citation Template)',
+						desc: '點擊「插入筆記」時的格式樣板。',
+						control: {
+							type: 'dropdown',
+							key: 'citationTemplate',
+							options: {
+								'blockquote': '引用區塊 (> 釋義)',
+								'footnote': '腳註引用 ([^詞條]: 釋義)',
+								'wikilink': '雙向連結 ([[詞條]])',
+								'raw': '原始文字'
+							}
+						}
+					},
+					{
+						name: '啟用編輯器右鍵選單劃詞即查',
+						desc: '選取文字後，右鍵選單顯示「在 Ezdict 查詢」項目。',
+						control: {
+							type: 'toggle',
+							key: 'enableSelectionMenu'
+						}
+					}
+				]
+			}
+		];
+	}
+
+	override getControlValue(key: string): unknown {
+		if (key === 'entryHeadingLevel') {
+			return String(this.plugin.settings.entryHeadingLevel ?? 3);
+		}
+		return (this.plugin.settings as unknown as Record<string, unknown>)[key];
+	}
+
+	override async setControlValue(key: string, value: unknown): Promise<void> {
+		if (key === 'entryHeadingLevel') {
+			this.plugin.settings.entryHeadingLevel = parseInt(String(value), 10);
+		} else {
+			(this.plugin.settings as unknown as Record<string, unknown>)[key] = value;
+		}
+		await this.plugin.saveSettings();
+		if (key === 'dictDirectory' || key === 'entryHeadingLevel') {
+			await this.plugin.engine.initialize();
+			await this.plugin.saveIndexCache();
+		}
+	}
+
+	/**
+	 * Imperative rendering for backward compatibility with Obsidian versions older than 1.13.0.
+	 */
 	display(): void {
 		const { containerEl } = this;
 		containerEl.empty();
