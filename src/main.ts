@@ -29,7 +29,7 @@ export default class MdtermPlugin extends Plugin {
 		// Register Command: Open Sidebar View
 		this.addCommand({
 			id: 'open-mdterm-sidebar',
-			name: '開啟 mdterm 辭典側邊欄',
+			name: 'show md dictionary panel',
 			callback: async () => {
 				await this.activateSidebarView();
 			}
@@ -38,7 +38,7 @@ export default class MdtermPlugin extends Plugin {
 		// Register Command: Quick Lookup Modal
 		this.addCommand({
 			id: 'quick-dict-lookup',
-			name: '快速辭典查詢 (彈窗)',
+			name: 'quick dictionary lookup (modal)',
 			editorCallback: (editor: Editor) => {
 				const selection = editor.getSelection().trim();
 				new DictSuggestModal(this.app, this, selection).open();
@@ -51,7 +51,7 @@ export default class MdtermPlugin extends Plugin {
 		// Register Command: Lookup Selection in Sidebar
 		this.addCommand({
 			id: 'lookup-selection-in-sidebar',
-			name: '在側邊欄查詢選取文字',
+			name: 'search selection in dictionary panel',
 			editorCallback: async (editor: Editor) => {
 				const selection = editor.getSelection().trim();
 				if (!selection) {

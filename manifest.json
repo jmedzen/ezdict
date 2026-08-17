@@ -1,6 +1,6 @@
 {
   "id": "mdterm",
-  "name": "mdterm — 離線佛學與文獻辭典",
+  "name": "mdterm",
   "version": "0.5.0",
   "minAppVersion": "1.4.0",
   "description": "High-performance offline dictionary reader & lookup engine for Obsidian. 專為數十 MB 巨型 Markdown 辭典設計，支援 Byte 切片秒開、三種檢索模式與劃詞即查。",
