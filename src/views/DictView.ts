@@ -353,7 +353,7 @@ export class DictView extends ItemView {
 
 		parts.forEach(part => {
 			if (terms.some(t => t.toLowerCase() === part.toLowerCase())) {
-				parent.createSpan({ text: part, cls: 'mdterm-highlight' });
+				parent.createSpan({ text: part, cls: 'suggestion-highlight mdterm-highlight' });
 			} else {
 				parent.createSpan({ text: part });
 			}

@@ -351,15 +351,18 @@
 	line-height: var(--line-height-normal, 1.5);
 }
 
-/* ── Search Match Highlight (Follows Obsidian Theme Selected Style) ── */
+/* ── Search Match Highlight (Obsidian Native suggestion-highlight) ── */
+.suggestion-highlight.mdterm-highlight,
 .mdterm-highlight {
-	background-color: var(--text-selection, rgba(var(--interactive-accent-rgb), 0.25)) !important;
-	color: var(--text-accent, var(--text-normal)) !important;
-	font-weight: var(--font-bold, 600) !important;
-	border-radius: var(--radius-s, 2px);
-	padding: 0 2px;
-	margin: 0;
+	background: transparent !important;
+	background-color: transparent !important;
+	color: var(--text-accent, var(--interactive-accent)) !important;
+	font-weight: var(--font-bold, 700) !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	border-radius: 0 !important;
 	box-shadow: none !important;
+	display: inline !important;
 }
 
 /* ── Entry Detail View ──────────────────────────────────────── */
