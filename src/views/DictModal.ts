@@ -15,7 +15,6 @@ export class DictSuggestModal extends SuggestModal<SearchResult> {
 	}
 
 	onOpen(): void {
-		super.onOpen();
 		if (this.initialQuery) {
 			this.inputEl.value = this.initialQuery;
 			this.inputEl.dispatchEvent(new Event('input'));
