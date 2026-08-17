@@ -46,9 +46,9 @@ export class MdtermSettingTab extends PluginSettingTab {
 		// 3. Max Results
 		new Setting(containerEl)
 			.setName('每本辭典最大搜尋筆數')
-			.setDesc('限制每本辭典回傳之最大結果數量（避免過多 DOM 節點造成卡頓）。')
+			.setDesc('限制每本辭典回傳之最大結果數量（預設 350 筆）。')
 			.addSlider(slider => slider
-				.setLimits(20, 300, 10)
+				.setLimits(20, 1000, 10)
 				.setValue(this.plugin.settings.maxResultsPerDict)
 				.setDynamicTooltip()
 				.onChange(async (value) => {

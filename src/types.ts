@@ -50,7 +50,7 @@ export interface SearchResult {
 export interface MdtermSettings {
 	dictDirectory: string;          // Directory containing dictionary .md files
 	defaultMode: DictSearchMode;    // 'prefix' | 'fuzzy' | 'fulltext'
-	maxResultsPerDict: number;      // Max results to return per dictionary (default: 100)
+	maxResultsPerDict: number;      // Max results to return per dictionary (default: 350)
 	maxProximityDistance: number;   // Max proximity character distance for AND search (default: 150)
 	autoLookupOnSelect: boolean;    // Auto lookup when opening modal with selection
 	dictFileOrder: string[];        // Persisted file path order
@@ -62,7 +62,7 @@ export interface MdtermSettings {
 export const DEFAULT_SETTINGS: MdtermSettings = {
 	dictDirectory: "dicts",
 	defaultMode: "prefix",
-	maxResultsPerDict: 100,
+	maxResultsPerDict: 350,
 	maxProximityDistance: 150,
 	autoLookupOnSelect: true,
 	dictFileOrder: [],
