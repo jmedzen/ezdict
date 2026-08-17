@@ -351,15 +351,15 @@
 	line-height: 1.45;
 }
 
-/* ── Highlight Styling (Theme Safe) ─────────────────────────── */
-mark.mdterm-highlight,
+/* ── Search Match Highlight (Follows Obsidian Theme Selected Style) ── */
 .mdterm-highlight {
-	background-color: var(--text-highlight-bg, rgba(255, 208, 0, 0.28)) !important;
-	color: var(--text-normal) !important;
-	font-weight: 600;
-	border-radius: var(--radius-s, 3px);
-	padding: 1px 3px;
-	margin: 0 1px;
+	background-color: var(--text-selection, rgba(var(--interactive-accent-rgb), 0.25)) !important;
+	color: var(--text-accent, var(--text-normal)) !important;
+	font-weight: var(--font-bold, 600) !important;
+	border-radius: var(--radius-s, 2px);
+	padding: 0 2px;
+	margin: 0;
+	box-shadow: none !important;
 }
 
 /* ── Entry Detail View ──────────────────────────────────────── */
