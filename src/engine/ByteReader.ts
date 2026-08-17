@@ -3,15 +3,25 @@ import { App, FileSystemAdapter } from 'obsidian';
 /**
  * Ultra-fast byte-range slice reader.
  * Uses native Node.js fs.read when available on Desktop,
- * falls back to Obsidian Vault FileSystemAdapter / readBinary on other environments.
+ * uses memory-cached ArrayBuffer on Mobile (iOS / iPadOS / Android) to prevent repeated disk I/O.
  */
 export class ByteReader {
 	private app: App;
 	private textDecoder: TextDecoder;
+	private mobileBufferCache: Map<string, { mtime: number; buffer: ArrayBuffer }> = new Map();
+	private textCache: Map<string, { mtime: number; text: string }> = new Map();
 
 	constructor(app: App) {
 		this.app = app;
 		this.textDecoder = new TextDecoder('utf-8');
+	}
+
+	/**
+	 * Clears memory cache.
+	 */
+	clearCache(): void {
+		this.mobileBufferCache.clear();
+		this.textCache.clear();
 	}
 
 	/**
@@ -23,14 +33,13 @@ export class ByteReader {
 	async readSlice(filePath: string, offset: number, length: number): Promise<string> {
 		if (length <= 0) return '';
 
-		// 1. Try Node.js fs on Desktop environment (fastest: reads ONLY the exact slice without loading full file)
+		// 1. Desktop: Direct native Node.js fs.read slice (fastest, never loads full file into memory)
 		if (typeof window !== 'undefined' && (window as any).require) {
 			try {
 				const fs = (window as any).require('fs');
 				const pathModule = (window as any).require('path');
 				let fullPath = filePath;
 
-				// Resolve relative path to vault root if needed
 				if (!pathModule.isAbsolute(filePath)) {
 					const adapter = this.app.vault.adapter;
 					if (adapter instanceof FileSystemAdapter) {
@@ -50,26 +59,42 @@ export class ByteReader {
 					});
 				});
 			} catch (nodeErr) {
-				console.warn('[mdterm] Node fs slice read failed, falling back to Vault adapter:', nodeErr);
+				console.warn('[Ezdict] Node fs slice read failed, falling back to Vault adapter:', nodeErr);
 			}
 		}
 
-		// 2. Fallback: Obsidian Vault FileSystemAdapter (Mobile / Web)
+		// 2. Mobile (iOS / iPadOS / Android): In-memory cached ArrayBuffer slice (0ms without disk re-reading)
 		try {
 			const normalizedPath = filePath.replace(/\\/g, '/');
-			const arrayBuffer = await this.app.vault.adapter.readBinary(normalizedPath);
-			const slice = arrayBuffer.slice(offset, offset + length);
+			let cached = this.mobileBufferCache.get(normalizedPath);
+
+			if (!cached) {
+				const stat = await this.app.vault.adapter.stat(normalizedPath);
+				const buffer = await this.app.vault.adapter.readBinary(normalizedPath);
+				cached = { mtime: stat?.mtime || 0, buffer };
+
+				// Keep at most 3 dictionary buffers in cache to prevent mobile memory pressure
+				if (this.mobileBufferCache.size >= 3) {
+					const firstKey = this.mobileBufferCache.keys().next().value;
+					if (firstKey) this.mobileBufferCache.delete(firstKey);
+				}
+				this.mobileBufferCache.set(normalizedPath, cached);
+			}
+
+			const slice = cached.buffer.slice(offset, offset + length);
 			return this.textDecoder.decode(slice);
 		} catch (adapterErr) {
-			console.error('[mdterm] Failed to read slice via adapter:', adapterErr);
+			console.error('[Ezdict] Failed to read slice via adapter:', adapterErr);
 			throw adapterErr;
 		}
 	}
 
 	/**
-	 * Reads the entire text of a file (used during initial indexing).
+	 * Reads the entire text of a file with caching.
 	 */
 	async readFullText(filePath: string): Promise<string> {
+		const normalizedPath = filePath.replace(/\\/g, '/');
+
 		if (typeof window !== 'undefined' && (window as any).require) {
 			try {
 				const fs = (window as any).require('fs');
@@ -83,11 +108,35 @@ export class ByteReader {
 					}
 				}
 
-				return await fs.promises.readFile(fullPath, 'utf-8');
+				const stat = await fs.promises.stat(fullPath);
+				const cached = this.textCache.get(normalizedPath);
+				if (cached && cached.mtime === stat.mtimeMs) {
+					return cached.text;
+				}
+
+				const text = await fs.promises.readFile(fullPath, 'utf-8');
+				this.textCache.set(normalizedPath, { mtime: stat.mtimeMs, text });
+				return text;
 			} catch (_) {}
 		}
 
-		const normalizedPath = filePath.replace(/\\/g, '/');
-		return await this.app.vault.adapter.read(normalizedPath);
+		// Mobile environment
+		try {
+			const stat = await this.app.vault.adapter.stat(normalizedPath);
+			const cached = this.textCache.get(normalizedPath);
+			if (cached && cached.mtime === (stat?.mtime || 0)) {
+				return cached.text;
+			}
+
+			const text = await this.app.vault.adapter.read(normalizedPath);
+			if (this.textCache.size >= 3) {
+				const firstKey = this.textCache.keys().next().value;
+				if (firstKey) this.textCache.delete(firstKey);
+			}
+			this.textCache.set(normalizedPath, { mtime: stat?.mtime || 0, text });
+			return text;
+		} catch (e) {
+			return await this.app.vault.adapter.read(normalizedPath);
+		}
 	}
 }

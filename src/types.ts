@@ -10,6 +10,8 @@ export interface DictEntry {
 	cleanHeadword: string;
 	byteOffset: number;
 	byteLength: number;
+	charOffset?: number;
+	charLength?: number;
 	lineStart: number;
 	lineEnd: number;
 }

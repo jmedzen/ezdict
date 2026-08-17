@@ -204,30 +204,103 @@ export class DictEngine {
 
 			for (const file of activeFiles) {
 				const sIdx = this.sectionIndexes.get(file.id);
-				if (!sIdx) continue;
+				if (!sIdx || sIdx.entries.length === 0) continue;
+
+				// Read entire file content ONCE (< 15ms) with mobile memory caching
+				const fullContent = await this.byteReader.readFullText(file.path);
+				if (!fullContent) continue;
+
+				// Fast pre-filter: all search terms must exist in the dictionary
+				if (!terms.every(t => fullContent.includes(t))) continue;
 
 				let foundCount = 0;
-				for (const entry of sIdx.entries) {
-					if (foundCount >= maxResults) break;
-					// Read entry slice
-					const text = await this.byteReader.readSlice(file.path, entry.byteOffset, entry.byteLength);
-					const matches = BigramIndex.scanEntryText(
-						text,
-						terms,
-						this.settings.maxProximityDistance,
-						file.id,
-						file.name,
-						entry
-					);
-					if (matches.length > 0) {
-						allResults.push(...matches);
-						foundCount += matches.length;
+				const entries = sIdx.entries;
+				const primaryTerm = terms[0];
+				let pos = 0;
+				const seenEntryIds = new Set<number>();
+
+				// Ultra-fast in-memory character scanning
+				while (pos < fullContent.length && foundCount < maxResults) {
+					const matchCharIdx = fullContent.indexOf(primaryTerm, pos);
+					if (matchCharIdx === -1) break;
+
+					// Binary search to find entry containing this character offset in O(log N)
+					const entry = this.findEntryAtCharOffset(entries, matchCharIdx, fullContent);
+					if (entry && !seenEntryIds.has(entry.id)) {
+						seenEntryIds.add(entry.id);
+
+						let entryText = '';
+						if (entry.charOffset !== undefined && entry.charLength !== undefined) {
+							entryText = fullContent.substring(entry.charOffset, entry.charOffset + entry.charLength);
+						} else {
+							entryText = fullContent;
+						}
+
+						const matches = BigramIndex.scanEntryText(
+							entryText,
+							terms,
+							this.settings.maxProximityDistance,
+							file.id,
+							file.name,
+							entry
+						);
+
+						if (matches.length > 0) {
+							allResults.push(...matches);
+							foundCount += matches.length;
+						}
 					}
+
+					pos = matchCharIdx + primaryTerm.length;
 				}
 			}
 		}
 
 		return allResults;
+	}
+
+	/**
+	 * Locates which entry owns a character index using O(log N) binary search.
+	 */
+	private findEntryAtCharOffset(entries: DictEntry[], charPos: number, fullContent: string): DictEntry | null {
+		if (entries.length === 0) return null;
+
+		if (entries[0].charOffset !== undefined) {
+			let lo = 0, hi = entries.length - 1;
+			while (lo <= hi) {
+				const mid = (lo + hi) >> 1;
+				const e = entries[mid];
+				const start = e.charOffset ?? 0;
+				const end = start + (e.charLength ?? 0);
+				if (charPos >= start && charPos < end) {
+					return e;
+				} else if (charPos < start) {
+					hi = mid - 1;
+				} else {
+					lo = mid + 1;
+				}
+			}
+			return null;
+		}
+
+		// Fallback for legacy cache: proportional byte ratio estimation
+		const ratio = charPos / fullContent.length;
+		const lastEntry = entries[entries.length - 1];
+		const targetByteOffset = ratio * (lastEntry.byteOffset + lastEntry.byteLength);
+		let lo = 0, hi = entries.length - 1;
+		while (lo <= hi) {
+			const mid = (lo + hi) >> 1;
+			const e = entries[mid];
+			const end = e.byteOffset + e.byteLength;
+			if (targetByteOffset >= e.byteOffset && targetByteOffset < end) {
+				return e;
+			} else if (targetByteOffset < e.byteOffset) {
+				hi = mid - 1;
+			} else {
+				lo = mid + 1;
+			}
+		}
+		return null;
 	}
 
 	/**

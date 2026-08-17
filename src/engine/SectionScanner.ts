@@ -22,7 +22,7 @@ export function scanSections(
 	mtime: number,
 	targetHeadingLevel: number = 3
 ): SectionIndex {
-	const rawHeadings: { depth: number; offset: number; lineStart: number; rawHeadword: string }[] = [];
+	const rawHeadings: { depth: number; byteOffset: number; charOffset: number; lineStart: number; rawHeadword: string }[] = [];
 	let byteOffset = 0;
 	let lineNum = 1;
 	let idx = 0;
@@ -32,6 +32,7 @@ export function scanSections(
 	const encoder = new TextEncoder();
 
 	while (idx < len) {
+		const lineStartChar = idx;
 		let nl = text.indexOf('\n', idx);
 		if (nl === -1) nl = len;
 		let contentEnd = nl;
@@ -46,7 +47,8 @@ export function scanSections(
 		if (m) {
 			rawHeadings.push({
 				depth: m[1].length,
-				offset: byteOffset,
+				byteOffset: byteOffset,
+				charOffset: lineStartChar,
 				lineStart: lineNum,
 				rawHeadword: m[2].trim()
 			});
@@ -91,19 +93,22 @@ export function scanSections(
 
 	const entries: DictEntry[] = [];
 	let entrySeq = 0;
-	let pendingGroupOffset = -1;
+	let pendingGroupByteOffset = -1;
+	let pendingGroupCharOffset = -1;
 	let pendingGroupLine = -1;
 
 	for (const h of rawHeadings) {
 		if (h.depth < entryLevel) {
 			// Shallower heading (category / volume header), fold into first following entry
-			if (pendingGroupOffset === -1) {
-				pendingGroupOffset = h.offset;
+			if (pendingGroupByteOffset === -1) {
+				pendingGroupByteOffset = h.byteOffset;
+				pendingGroupCharOffset = h.charOffset;
 				pendingGroupLine = h.lineStart;
 			}
 		} else if (h.depth === entryLevel) {
 			// Exact entry heading level
-			const offset = pendingGroupOffset >= 0 ? pendingGroupOffset : h.offset;
+			const bOffset = pendingGroupByteOffset >= 0 ? pendingGroupByteOffset : h.byteOffset;
+			const cOffset = pendingGroupCharOffset >= 0 ? pendingGroupCharOffset : h.charOffset;
 			const lineStart = pendingGroupLine >= 0 ? pendingGroupLine : h.lineStart;
 			const clean = cleanHeadword(h.rawHeadword);
 			if (clean) {
@@ -111,28 +116,37 @@ export function scanSections(
 					id: entrySeq++,
 					headword: h.rawHeadword,
 					cleanHeadword: clean,
-					byteOffset: offset,
+					byteOffset: bOffset,
 					byteLength: 0,
+					charOffset: cOffset,
+					charLength: 0,
 					lineStart: lineStart,
 					lineEnd: totalLines
 				});
 			}
-			pendingGroupOffset = -1;
+			pendingGroupByteOffset = -1;
+			pendingGroupCharOffset = -1;
 			pendingGroupLine = -1;
 		}
 		// h.depth > entryLevel is sub-heading within entry content, not a new entry boundary
 	}
 
-	// Compute byteLength and lineEnd for each entry
+	// Compute byteLength, charLength, and lineEnd for each entry
 	for (let i = 0; i < entries.length; i++) {
 		const curr = entries[i];
 		if (i + 1 < entries.length) {
 			const next = entries[i + 1];
 			curr.lineEnd = next.lineStart - 1;
 			curr.byteLength = next.byteOffset - curr.byteOffset;
+			if (curr.charOffset !== undefined && next.charOffset !== undefined) {
+				curr.charLength = next.charOffset - curr.charOffset;
+			}
 		} else {
 			curr.lineEnd = totalLines;
 			curr.byteLength = totalBytes - curr.byteOffset;
+			if (curr.charOffset !== undefined) {
+				curr.charLength = len - curr.charOffset;
+			}
 		}
 	}
 
