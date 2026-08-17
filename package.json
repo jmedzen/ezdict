@@ -1,6 +1,6 @@
 {
   "name": "ezdict",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "High-performance offline dictionary reader and lookup plugin for Obsidian, designed for massive markdown reference books and dictionaries.",
   "main": "main.js",
   "scripts": {
