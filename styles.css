@@ -55,16 +55,20 @@
 	flex-shrink: 0;
 }
 
+.ezdict-view input.ezdict-search-input,
+.mdterm-view input.mdterm-search-input,
+.ezdict-search-container input.ezdict-search-input,
+.mdterm-search-container input.mdterm-search-input,
 .ezdict-search-input,
 .mdterm-search-input {
 	flex: 1;
-	border: none !important;
-	background: transparent !important;
-	outline: none !important;
-	box-shadow: none !important;
-	padding: 6px 0 !important;
+	border: none;
+	background: transparent;
+	outline: none;
+	box-shadow: none;
+	padding: 6px 0;
 	font-size: var(--font-ui-medium, var(--font-text-size));
-	color: var(--text-normal) !important;
+	color: var(--text-normal);
 }
 
 .ezdict-search-input::placeholder,
@@ -399,19 +403,25 @@
 }
 
 /* ── Search Match Highlight (Obsidian Native suggestion-highlight) ── */
+.ezdict-view .suggestion-highlight.ezdict-highlight,
+.ezdict-view .suggestion-highlight,
+.ezdict-view .ezdict-highlight,
+.mdterm-view .suggestion-highlight.mdterm-highlight,
+.mdterm-view .suggestion-highlight,
+.mdterm-view .mdterm-highlight,
 .suggestion-highlight.ezdict-highlight,
 .suggestion-highlight.mdterm-highlight,
 .ezdict-highlight,
 .mdterm-highlight {
-	background: transparent !important;
-	background-color: transparent !important;
-	color: var(--text-accent, var(--interactive-accent)) !important;
-	font-weight: var(--font-bold, 700) !important;
-	padding: 0 !important;
-	margin: 0 !important;
-	border-radius: 0 !important;
-	box-shadow: none !important;
-	display: inline !important;
+	background: transparent;
+	background-color: transparent;
+	color: var(--text-accent, var(--interactive-accent));
+	font-weight: var(--font-bold, 700);
+	padding: 0;
+	margin: 0;
+	border-radius: 0;
+	box-shadow: none;
+	display: inline;
 }
 
 /* ── Entry Detail View ──────────────────────────────────────── */
@@ -491,6 +501,10 @@
 	background-color: var(--background-modifier-hover);
 }
 
+.workspace-leaf-content[data-type="ezdict-dictionary-view"] .ezdict-detail-content,
+.workspace-leaf-content[data-type="ezdict-dictionary-view"] .mdterm-detail-content,
+.ezdict-view .ezdict-detail-content,
+.mdterm-view .mdterm-detail-content,
 .ezdict-detail-content,
 .mdterm-detail-content {
 	flex: 1;
@@ -499,15 +513,19 @@
 	line-height: var(--line-height-normal, 1.72);
 	padding-right: 4px;
 	color: var(--text-normal);
-	user-select: text !important;
-	-webkit-user-select: text !important;
+	user-select: text;
+	-webkit-user-select: text;
 	cursor: text;
 }
 
+.workspace-leaf-content[data-type="ezdict-dictionary-view"] .ezdict-detail-content *,
+.workspace-leaf-content[data-type="ezdict-dictionary-view"] .mdterm-detail-content *,
+.ezdict-view .ezdict-detail-content *,
+.mdterm-view .mdterm-detail-content *,
 .ezdict-detail-content *,
 .mdterm-detail-content * {
-	user-select: text !important;
-	-webkit-user-select: text !important;
+	user-select: text;
+	-webkit-user-select: text;
 }
 
 .ezdict-detail-content a,
