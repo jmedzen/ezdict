@@ -1,0 +1,461 @@
+/* ================================================================
+   mdterm — Obsidian Offline Dictionary Plugin Stylesheet
+   ================================================================ */
+
+.mdterm-view-container {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	padding: 0;
+	overflow: hidden;
+	background-color: var(--background-primary);
+	color: var(--text-normal);
+	font-family: var(--font-text);
+}
+
+/* ── Header Area ────────────────────────────────────────────── */
+.mdterm-header {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 12px 14px 8px 14px;
+	background-color: var(--background-secondary);
+	border-bottom: 1px solid var(--divider-color);
+	flex-shrink: 0;
+}
+
+.mdterm-search-wrap {
+	display: flex;
+	align-items: center;
+	position: relative;
+	background-color: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m, 6px);
+	padding: 2px 8px;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.mdterm-search-wrap:focus-within {
+	border-color: var(--interactive-accent);
+	box-shadow: 0 0 0 2px var(--background-modifier-box-shadow);
+}
+
+.mdterm-search-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--text-muted);
+	margin-right: 6px;
+}
+
+.mdterm-search-input {
+	flex: 1;
+	border: none !important;
+	background: transparent !important;
+	outline: none !important;
+	box-shadow: none !important;
+	padding: 6px 0 !important;
+	font-size: 13.5px;
+	color: var(--text-normal);
+}
+
+.mdterm-search-clear-btn {
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	color: var(--text-muted);
+	padding: 4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 4px;
+}
+
+.mdterm-search-clear-btn:hover {
+	color: var(--text-normal);
+	background-color: var(--background-modifier-hover);
+}
+
+/* ── Mode Tabs ──────────────────────────────────────────────── */
+.mdterm-mode-tabs {
+	display: flex;
+	gap: 4px;
+	background-color: var(--background-primary);
+	padding: 3px;
+	border-radius: var(--radius-m, 6px);
+	border: 1px solid var(--background-modifier-border);
+}
+
+.mdterm-mode-tab {
+	flex: 1;
+	border: none;
+	background: transparent;
+	font-size: 12px;
+	font-weight: 500;
+	color: var(--text-muted);
+	padding: 4px 6px;
+	border-radius: var(--radius-s, 4px);
+	cursor: pointer;
+	transition: all 0.15s ease;
+	text-align: center;
+}
+
+.mdterm-mode-tab:hover {
+	color: var(--text-normal);
+	background-color: var(--background-modifier-hover);
+}
+
+.mdterm-mode-tab.active {
+	color: var(--text-on-accent, #ffffff);
+	background-color: var(--interactive-accent);
+	font-weight: 600;
+}
+
+/* ── Dictionary Selector Drawer ────────────────────────────── */
+.mdterm-dict-toggle-header {
+	display: flex;
+	align-items: center;
+}
+
+.mdterm-dict-toggle-btn {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 11.5px;
+	color: var(--text-muted);
+	cursor: pointer;
+	padding: 4px 6px;
+	border-radius: 4px;
+	user-select: none;
+	width: 100%;
+}
+
+.mdterm-dict-toggle-btn:hover {
+	color: var(--text-normal);
+	background-color: var(--background-modifier-hover);
+}
+
+.mdterm-dict-chevron {
+	display: flex;
+	align-items: center;
+	transition: transform 0.2s ease;
+}
+
+.mdterm-dict-toggle-btn.open .mdterm-dict-chevron {
+	transform: rotate(90deg);
+}
+
+.mdterm-dict-drawer {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	background-color: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m, 6px);
+	padding: 8px;
+	max-height: 240px;
+	overflow-y: auto;
+	transition: all 0.2s ease;
+}
+
+.mdterm-dict-drawer.collapsed {
+	display: none;
+}
+
+.mdterm-drawer-actions {
+	display: flex;
+	justify-content: flex-end;
+	padding-bottom: 4px;
+	border-bottom: 1px solid var(--divider-color);
+}
+
+.mdterm-drawer-action-btn {
+	font-size: 11px;
+	padding: 2px 6px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	background-color: var(--background-secondary);
+	cursor: pointer;
+}
+
+.mdterm-drawer-list {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.mdterm-drawer-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 4px 6px;
+	border-radius: 4px;
+	background-color: var(--background-secondary-alt);
+}
+
+.mdterm-drawer-item-name {
+	flex: 1;
+	font-size: 12px;
+	font-weight: 500;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.mdterm-drawer-item-count {
+	font-size: 10.5px;
+	color: var(--text-muted);
+}
+
+.mdterm-drawer-sort-btns {
+	display: flex;
+	gap: 2px;
+}
+
+.mdterm-drawer-sort-btn {
+	padding: 2px 4px;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	color: var(--text-muted);
+	border-radius: 3px;
+}
+
+.mdterm-drawer-sort-btn:hover:not(:disabled) {
+	color: var(--text-normal);
+	background-color: var(--background-modifier-hover);
+}
+
+.mdterm-drawer-sort-btn:disabled {
+	opacity: 0.3;
+	cursor: default;
+}
+
+/* ── Body & Results ─────────────────────────────────────────── */
+.mdterm-body {
+	flex: 1;
+	overflow-y: auto;
+	position: relative;
+	padding: 10px 14px;
+}
+
+.mdterm-placeholder, .mdterm-loading-spinner {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 40px 10px;
+	color: var(--text-muted);
+	font-size: 13px;
+	text-align: center;
+}
+
+.mdterm-results-status {
+	font-size: 11.5px;
+	color: var(--text-muted);
+	margin-bottom: 8px;
+	padding-left: 2px;
+}
+
+.mdterm-result-group {
+	margin-bottom: 12px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m, 6px);
+	overflow: hidden;
+	background-color: var(--background-secondary);
+}
+
+.mdterm-result-group-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 7px 10px;
+	background-color: var(--background-secondary-alt);
+	cursor: pointer;
+	user-select: none;
+}
+
+.mdterm-result-group-header:hover {
+	background-color: var(--background-modifier-hover);
+}
+
+.mdterm-result-group-title {
+	font-size: 12.5px;
+	font-weight: 600;
+}
+
+.mdterm-result-group-badge {
+	font-size: 10.5px;
+	padding: 1px 6px;
+	border-radius: 10px;
+	background-color: var(--background-modifier-border);
+	color: var(--text-muted);
+}
+
+.mdterm-result-group.collapsed .mdterm-result-items-list {
+	display: none;
+}
+
+.mdterm-result-items-list {
+	display: flex;
+	flex-direction: column;
+}
+
+.mdterm-result-item {
+	padding: 8px 10px;
+	border-top: 1px solid var(--divider-color);
+	cursor: pointer;
+	transition: background-color 0.15s ease;
+}
+
+.mdterm-result-item:hover {
+	background-color: var(--background-modifier-hover);
+}
+
+.mdterm-result-headword {
+	font-size: 13.5px;
+	font-weight: 600;
+	color: var(--interactive-accent);
+}
+
+.mdterm-result-snippet {
+	font-size: 12px;
+	color: var(--text-muted);
+	margin-top: 3px;
+	line-height: 1.4;
+}
+
+.mdterm-highlight {
+	background-color: var(--text-highlight-bg, rgba(255, 208, 0, 0.35));
+	color: inherit;
+	border-radius: 2px;
+	padding: 0 2px;
+}
+
+/* ── Entry Detail View ──────────────────────────────────────── */
+.mdterm-entry-detail-container {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.mdterm-entry-detail-container.hidden,
+.mdterm-results-container.hidden {
+	display: none;
+}
+
+.mdterm-detail-nav {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding-bottom: 8px;
+	margin-bottom: 12px;
+	border-bottom: 1px solid var(--divider-color);
+}
+
+.mdterm-detail-nav-btn {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 12px;
+	padding: 4px 8px;
+	border-radius: 4px;
+	background-color: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	cursor: pointer;
+}
+
+.mdterm-detail-nav-btn:hover {
+	background-color: var(--background-modifier-hover);
+}
+
+.mdterm-detail-dict-tag {
+	font-size: 11.5px;
+	font-weight: 600;
+	color: var(--text-muted);
+}
+
+.mdterm-detail-actions {
+	display: flex;
+	gap: 4px;
+}
+
+.mdterm-action-icon-btn {
+	padding: 4px 6px;
+	background-color: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	cursor: pointer;
+	color: var(--text-muted);
+}
+
+.mdterm-action-icon-btn:hover {
+	color: var(--text-normal);
+	background-color: var(--background-modifier-hover);
+}
+
+.mdterm-detail-content {
+	flex: 1;
+	overflow-y: auto;
+	font-size: 14.5px;
+	line-height: 1.68;
+	padding-right: 4px;
+}
+
+.mdterm-detail-pagination {
+	display: flex;
+	justify-content: space-between;
+	padding-top: 12px;
+	margin-top: 16px;
+	border-top: 1px solid var(--divider-color);
+}
+
+.mdterm-pagination-btn {
+	font-size: 12px;
+	padding: 5px 10px;
+	background-color: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	cursor: pointer;
+	max-width: 48%;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.mdterm-pagination-btn:hover:not(:disabled) {
+	background-color: var(--background-modifier-hover);
+}
+
+.mdterm-pagination-btn:disabled {
+	opacity: 0.35;
+	cursor: default;
+}
+
+/* ── Modal Suggestion Styles ────────────────────────────────── */
+.mdterm-modal-suggest-item {
+	padding: 8px 12px;
+}
+
+.mdterm-modal-suggest-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.mdterm-modal-suggest-title {
+	font-weight: 600;
+	color: var(--interactive-accent);
+}
+
+.mdterm-modal-suggest-dict {
+	font-size: 11px;
+	color: var(--text-muted);
+}
+
+.mdterm-modal-suggest-snippet {
+	font-size: 12px;
+	color: var(--text-muted);
+	margin-top: 2px;
+}
