@@ -384,24 +384,15 @@ export class DictView extends ItemView {
 		// Detail Header Navigation Bar
 		const navHeaderEl = this.entryDetailContainerEl.createDiv({ cls: 'ezdict-detail-nav' });
 
-		const hasHistory = this.entryHistory.length > 0;
 		const backBtn = navHeaderEl.createEl('button', {
 			cls: 'ezdict-detail-nav-btn',
-			attr: { title: hasHistory ? '返回上一條詞目' : '返回結果列表' }
+			attr: { title: '返回搜尋結果' }
 		});
 		setIcon(backBtn, 'arrow-left');
-		backBtn.createSpan({ text: hasHistory ? '上一條' : '返回' });
+		backBtn.createSpan({ text: '返回' });
 		backBtn.addEventListener('click', () => {
-			if (this.entryHistory.length > 0) {
-				const prev = this.entryHistory.pop();
-				if (prev) {
-					this.openEntryDetail(prev.fileId, prev.entryId, false);
-				} else {
-					this.showResultsView();
-				}
-			} else {
-				this.showResultsView();
-			}
+			this.entryHistory = [];
+			this.showResultsView();
 		});
 
 		const dictTagEl = navHeaderEl.createSpan({ cls: 'ezdict-detail-dict-tag', text: `📖 ${result.file.name}` });
