@@ -3,9 +3,9 @@
   "name": "Ezdict",
   "version": "1.1.3",
   "minAppVersion": "1.4.0",
-  "description": "High-performance offline markdown dictionary reader & lookup engine. 專為巨型 Markdown 辭典設計，支援 Byte 切片秒開、三種檢索模式與劃詞即查。",
+  "description": "High-performance offline markdown dictionary reader and lookup engine with instant byte-range slicing.",
   "author": "jmedzen",
-  "authorUrl": "https://github.com/jmedzen",
+  "authorUrl": "https://github.com/jmedzen/ezdict",
   "fundingUrl": "https://github.com/jmedzen/ezdict",
   "isDesktopOnly": false
 }
