@@ -5,7 +5,7 @@
   "minAppVersion": "1.7.2",
   "description": "High-performance offline markdown dictionary reader and lookup engine with instant byte-range slicing.",
   "author": "jmedzen",
-  "authorUrl": "https://github.com/jmedzen/ezdict",
-  "fundingUrl": "https://github.com/jmedzen/ezdict",
+  "authorUrl": "https://github.com/jmedzen",
+  "fundingUrl": "https://github.com/sponsors/jmedzen",
   "isDesktopOnly": false
 }
