@@ -29,7 +29,26 @@ export class MdtermSettingTab extends PluginSettingTab {
 					await this.plugin.engine.initialize();
 				}));
 
-		// 2. Default Search Mode
+		// 2. Entry Heading Level Setting (h2 ~ h6)
+		new Setting(containerEl)
+			.setName('詞條標題層級 (Entry Heading Level)')
+			.setDesc('定義 Markdown 中作為獨立詞條開頭的標題層級（預設為 h3 ###）。修改後將自動重新掃描辭典檔案並更新索引。')
+			.addDropdown(dropdown => dropdown
+				.addOption('2', 'h2 (## 標題二)')
+				.addOption('3', 'h3 (### 標題三 - 預設)')
+				.addOption('4', 'h4 (#### 標題四)')
+				.addOption('5', 'h5 (##### 標題五)')
+				.addOption('6', 'h6 (###### 標題六)')
+				.addOption('0', '自動偵測 (Auto-Detect 最深層級)')
+				.setValue(String(this.plugin.settings.entryHeadingLevel ?? 3))
+				.onChange(async (value) => {
+					this.plugin.settings.entryHeadingLevel = parseInt(value, 10);
+					await this.plugin.saveSettings();
+					await this.plugin.engine.initialize();
+					await this.plugin.saveIndexCache();
+				}));
+
+		// 3. Default Search Mode
 		new Setting(containerEl)
 			.setName('預設搜尋模式 (Default Search Mode)')
 			.setDesc('開啟面板或進行查詢時的預設模式。')

@@ -57,9 +57,10 @@ export class DictEngine {
 				let sectionIndex: SectionIndex | null = null;
 
 				// Check cached index
+				const targetLevel = this.settings.entryHeadingLevel || 3;
 				if (cachedData && cachedData[f.path]) {
 					const cached = cachedData[f.path];
-					if (cached.mtime === f.mtime && cached.size === f.size) {
+					if (cached.mtime === f.mtime && cached.size === f.size && (!cached.entryLevel || cached.entryLevel === targetLevel)) {
 						sectionIndex = { ...cached, fileId: f.id };
 					}
 				}
@@ -67,7 +68,7 @@ export class DictEngine {
 				// If cache miss, scan and build
 				if (!sectionIndex) {
 					const text = await this.byteReader.readFullText(f.path);
-					sectionIndex = scanSections(text, f.id, f.path, f.size, f.mtime);
+					sectionIndex = scanSections(text, f.id, f.path, f.size, f.mtime, targetLevel);
 				}
 
 				f.entryCount = sectionIndex.entries.length;

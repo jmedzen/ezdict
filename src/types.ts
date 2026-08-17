@@ -49,6 +49,7 @@ export interface SearchResult {
 
 export interface MdtermSettings {
 	dictDirectory: string;          // Directory containing dictionary .md files
+	entryHeadingLevel: number;      // Heading level for dictionary entries (2..6, default: 3 for h3)
 	defaultMode: DictSearchMode;    // 'prefix' | 'fuzzy' | 'fulltext'
 	maxResultsPerDict: number;      // Max results to return per dictionary (default: 350)
 	maxProximityDistance: number;   // Max proximity character distance for AND search (default: 150)
@@ -61,6 +62,7 @@ export interface MdtermSettings {
 
 export const DEFAULT_SETTINGS: MdtermSettings = {
 	dictDirectory: "dicts",
+	entryHeadingLevel: 3,           // default: h3 (###)
 	defaultMode: "prefix",
 	maxResultsPerDict: 350,
 	maxProximityDistance: 150,

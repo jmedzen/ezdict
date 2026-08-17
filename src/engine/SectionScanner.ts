@@ -11,10 +11,17 @@ export function cleanHeadword(hw: string): string {
 
 /**
  * Scans a markdown text to build an entry-level section index.
- * Identifies the deepest heading level present as the entry level.
+ * Uses targetHeadingLevel (default 3 for h3) or auto-detects.
  * Calculates exact UTF-8 byte offsets so byte-range reads never split code points.
  */
-export function scanSections(text: string, fileId: number, filePath: string, size: number, mtime: number): SectionIndex {
+export function scanSections(
+	text: string,
+	fileId: number,
+	filePath: string,
+	size: number,
+	mtime: number,
+	targetHeadingLevel: number = 3
+): SectionIndex {
 	const rawHeadings: { depth: number; offset: number; lineStart: number; rawHeadword: string }[] = [];
 	let byteOffset = 0;
 	let lineNum = 1;
@@ -68,10 +75,18 @@ export function scanSections(text: string, fileId: number, filePath: string, siz
 		};
 	}
 
-	// Determine deepest heading level as entry level
+	// Determine entry level: user-configured level if present in file, otherwise deepest level
 	let entryLevel = 0;
-	for (const h of rawHeadings) {
-		if (h.depth > entryLevel) entryLevel = h.depth;
+	if (targetHeadingLevel && targetHeadingLevel >= 1 && targetHeadingLevel <= 6) {
+		const hasTarget = rawHeadings.some(h => h.depth === targetHeadingLevel);
+		if (hasTarget) {
+			entryLevel = targetHeadingLevel;
+		}
+	}
+	if (entryLevel === 0) {
+		for (const h of rawHeadings) {
+			if (h.depth > entryLevel) entryLevel = h.depth;
+		}
 	}
 
 	const entries: DictEntry[] = [];
@@ -82,9 +97,12 @@ export function scanSections(text: string, fileId: number, filePath: string, siz
 	for (const h of rawHeadings) {
 		if (h.depth < entryLevel) {
 			// Shallower heading (category / volume header), fold into first following entry
-			pendingGroupOffset = h.offset;
-			pendingGroupLine = h.lineStart;
-		} else {
+			if (pendingGroupOffset === -1) {
+				pendingGroupOffset = h.offset;
+				pendingGroupLine = h.lineStart;
+			}
+		} else if (h.depth === entryLevel) {
+			// Exact entry heading level
 			const offset = pendingGroupOffset >= 0 ? pendingGroupOffset : h.offset;
 			const lineStart = pendingGroupLine >= 0 ? pendingGroupLine : h.lineStart;
 			const clean = cleanHeadword(h.rawHeadword);
@@ -102,6 +120,7 @@ export function scanSections(text: string, fileId: number, filePath: string, siz
 			pendingGroupOffset = -1;
 			pendingGroupLine = -1;
 		}
+		// h.depth > entryLevel is sub-heading within entry content, not a new entry boundary
 	}
 
 	// Compute byteLength and lineEnd for each entry
