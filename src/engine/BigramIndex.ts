@@ -80,6 +80,27 @@ export class BigramIndex {
 	}
 
 	/**
+	 * Exact search on clean headwords using O(log N) binary search.
+	 */
+	findExact(headword: string): DictEntry | null {
+		const q = headword.trim();
+		if (!q || this.sortedEntries.length === 0) return null;
+
+		const sorted = this.sortedEntries;
+		let lo = 0, hi = sorted.length;
+		while (lo < hi) {
+			const mid = (lo + hi) >> 1;
+			if (sorted[mid].cleanHeadword < q) lo = mid + 1;
+			else hi = mid;
+		}
+
+		if (lo < sorted.length && sorted[lo].cleanHeadword === q) {
+			return sorted[lo];
+		}
+		return this.sortedEntries.find(e => e.cleanHeadword === q || e.headword === q) || null;
+	}
+
+	/**
 	 * Prefix search on clean headwords using O(log N) binary search.
 	 */
 	searchPrefix(query: string, maxResults: number = 100): SearchResult[] {

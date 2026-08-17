@@ -10,6 +10,8 @@ export class DictView extends ItemView {
 	private currentQuery: string = '';
 	private activeEntry: { fileId: number; entryId: number } | null = null;
 	private searchDebounceTimer: any = null;
+	private searchCache: Map<DictSearchMode, { query: string; results: SearchResult[] }> = new Map();
+	private entryHistory: { fileId: number; entryId: number }[] = [];
 
 	// DOM Elements
 	private searchInputEl: HTMLInputElement;
@@ -70,6 +72,10 @@ export class DictView extends ItemView {
 
 		this.searchInputEl.addEventListener('input', (e) => {
 			const val = (e.target as HTMLInputElement).value;
+			const trimmed = val.trim();
+			if (trimmed !== this.currentQuery.trim()) {
+				this.searchCache.clear();
+			}
 			this.currentQuery = val;
 			if (this.searchDebounceTimer) clearTimeout(this.searchDebounceTimer);
 			this.searchDebounceTimer = setTimeout(() => {
@@ -85,6 +91,7 @@ export class DictView extends ItemView {
 		clearBtn.addEventListener('click', () => {
 			this.searchInputEl.value = '';
 			this.currentQuery = '';
+			this.searchCache.clear();
 			this.executeSearch('');
 			this.searchInputEl.focus();
 		});
@@ -103,10 +110,25 @@ export class DictView extends ItemView {
 				text: m.label
 			});
 			tab.addEventListener('click', () => {
+				if (this.currentMode === m.id) return;
 				this.currentMode = m.id;
 				this.modeTabsEl.querySelectorAll('.mdterm-mode-tab').forEach(el => el.removeClass('active'));
 				tab.addClass('active');
-				this.executeSearch(this.currentQuery);
+
+				const q = this.currentQuery.trim();
+				if (!q) {
+					this.renderPlaceholder('📖 輸入關鍵詞開始查詢');
+					return;
+				}
+
+				// Check if we have cached results for this mode with the SAME query
+				const cached = this.searchCache.get(m.id);
+				if (cached && cached.query === q) {
+					this.showResultsView();
+					this.renderSearchResults(cached.results, q);
+				} else {
+					this.executeSearch(this.currentQuery);
+				}
 			});
 		});
 
@@ -148,6 +170,7 @@ export class DictView extends ItemView {
 			const allOn = files.every(f => f.enabled);
 			files.forEach(f => f.enabled = !allOn);
 			this.plugin.settings.disabledDicts = files.filter(f => !f.enabled).map(f => f.path);
+			this.searchCache.clear();
 			await this.plugin.saveSettings();
 			this.renderDictListDrawer();
 			this.executeSearch(this.currentQuery);
@@ -164,6 +187,7 @@ export class DictView extends ItemView {
 			cb.addEventListener('change', async (e) => {
 				f.enabled = (e.target as HTMLInputElement).checked;
 				this.plugin.settings.disabledDicts = files.filter(file => !file.enabled).map(file => file.path);
+				this.searchCache.clear();
 				await this.plugin.saveSettings();
 				this.executeSearch(this.currentQuery);
 			});
@@ -183,6 +207,7 @@ export class DictView extends ItemView {
 					files[idx - 1] = files[idx];
 					files[idx] = temp;
 					this.plugin.settings.dictFileOrder = files.map(file => file.path);
+					this.searchCache.clear();
 					await this.plugin.saveSettings();
 					this.renderDictListDrawer();
 					this.executeSearch(this.currentQuery);
@@ -198,6 +223,7 @@ export class DictView extends ItemView {
 					files[idx + 1] = files[idx];
 					files[idx] = temp;
 					this.plugin.settings.dictFileOrder = files.map(file => file.path);
+					this.searchCache.clear();
 					await this.plugin.saveSettings();
 					this.renderDictListDrawer();
 					this.executeSearch(this.currentQuery);
@@ -215,6 +241,9 @@ export class DictView extends ItemView {
 	public async searchExternal(query: string, mode?: DictSearchMode): Promise<void> {
 		this.showResultsView();
 		this.searchInputEl.value = query;
+		if (query.trim() !== this.currentQuery.trim()) {
+			this.searchCache.clear();
+		}
 		this.currentQuery = query;
 		if (mode) {
 			this.currentMode = mode;
@@ -237,6 +266,14 @@ export class DictView extends ItemView {
 			return;
 		}
 
+		// If this mode already has cached results for the EXACT same query, use them immediately
+		const cached = this.searchCache.get(this.currentMode);
+		if (cached && cached.query === q) {
+			this.showResultsView();
+			this.renderSearchResults(cached.results, q);
+			return;
+		}
+
 		this.showResultsView();
 		this.resultsContainerEl.empty();
 
@@ -245,6 +282,7 @@ export class DictView extends ItemView {
 
 		try {
 			const results = await this.plugin.engine.search(q, this.currentMode);
+			this.searchCache.set(this.currentMode, { query: q, results });
 			this.renderSearchResults(results, q);
 		} catch (err) {
 			this.resultsContainerEl.empty();
@@ -297,7 +335,8 @@ export class DictView extends ItemView {
 				}
 
 				itemEl.addEventListener('click', () => {
-					this.openEntryDetail(item.fileId, item.entryId);
+					this.entryHistory = [];
+					this.openEntryDetail(item.fileId, item.entryId, false);
 				});
 			});
 		});
@@ -321,7 +360,11 @@ export class DictView extends ItemView {
 		});
 	}
 
-	public async openEntryDetail(fileId: number, entryId: number): Promise<void> {
+	public async openEntryDetail(fileId: number, entryId: number, recordHistory: boolean = true): Promise<void> {
+		if (recordHistory && this.activeEntry && (this.activeEntry.fileId !== fileId || this.activeEntry.entryId !== entryId)) {
+			this.entryHistory.push({ fileId: this.activeEntry.fileId, entryId: this.activeEntry.entryId });
+		}
+
 		this.activeEntry = { fileId, entryId };
 		this.showDetailView();
 
@@ -341,10 +384,25 @@ export class DictView extends ItemView {
 		// Detail Header Navigation Bar
 		const navHeaderEl = this.entryDetailContainerEl.createDiv({ cls: 'mdterm-detail-nav' });
 
-		const backBtn = navHeaderEl.createEl('button', { cls: 'mdterm-detail-nav-btn', attr: { title: '返回結果列表' } });
+		const hasHistory = this.entryHistory.length > 0;
+		const backBtn = navHeaderEl.createEl('button', {
+			cls: 'mdterm-detail-nav-btn',
+			attr: { title: hasHistory ? '返回上一條詞目' : '返回結果列表' }
+		});
 		setIcon(backBtn, 'arrow-left');
-		backBtn.createSpan({ text: '返回' });
-		backBtn.addEventListener('click', () => this.showResultsView());
+		backBtn.createSpan({ text: hasHistory ? '上一條' : '返回' });
+		backBtn.addEventListener('click', () => {
+			if (this.entryHistory.length > 0) {
+				const prev = this.entryHistory.pop();
+				if (prev) {
+					this.openEntryDetail(prev.fileId, prev.entryId, false);
+				} else {
+					this.showResultsView();
+				}
+			} else {
+				this.showResultsView();
+			}
+		});
 
 		const dictTagEl = navHeaderEl.createSpan({ cls: 'mdterm-detail-dict-tag', text: `📖 ${result.file.name}` });
 
@@ -370,6 +428,48 @@ export class DictView extends ItemView {
 		comp.load();
 		await MarkdownRenderer.render(this.app, result.content, contentEl, '', comp);
 
+		// Intercept internal link clicks within dictionary reading area
+		contentEl.addEventListener('click', async (e: MouseEvent) => {
+			const target = e.target as HTMLElement;
+			const linkEl = target.closest('a');
+			if (!linkEl) return;
+
+			const href = linkEl.getAttribute('data-href') || linkEl.getAttribute('href');
+			if (!href) return;
+
+			// Skip external web links
+			if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('mailto:')) {
+				return;
+			}
+
+			e.preventDefault();
+			e.stopPropagation();
+
+			// Clean target headword from internal link (e.g. "[[唯識]]", "法相辭典#阿賴耶識", "#阿賴耶識", "唯識.md")
+			let targetText = href.replace(/^#/, '').replace(/\.md$/i, '').trim();
+			if (targetText.includes('#')) {
+				targetText = targetText.split('#')[1].trim();
+			}
+			targetText = targetText.replace(/^【/, '').replace(/】$/, '').trim();
+			if (!targetText) return;
+
+			// 1. Look in the CURRENT active dictionary first
+			let found = this.plugin.engine.findEntryByHeadword(fileId, targetText);
+
+			// 2. If not found in current dict, look across all other active dicts
+			if (!found) {
+				found = this.plugin.engine.findEntryInAnyDict(targetText);
+			}
+
+			if (found) {
+				await this.openEntryDetail(found.fileId, found.entry.id, true);
+			} else {
+				// Search in mdterm if no exact match
+				new Notice(`🔍 辭典中未找到完全相符的詞條「${targetText}」，改為搜尋…`);
+				await this.searchExternal(targetText);
+			}
+		});
+
 		// Bottom Prev/Next Pagination Bar
 		const paginationEl = this.entryDetailContainerEl.createDiv({ cls: 'mdterm-detail-pagination' });
 
@@ -381,7 +481,7 @@ export class DictView extends ItemView {
 		});
 		prevBtn.disabled = !prevEntry;
 		if (prevEntry) {
-			prevBtn.addEventListener('click', () => this.openEntryDetail(fileId, prevEntry.id));
+			prevBtn.addEventListener('click', () => this.openEntryDetail(fileId, prevEntry.id, true));
 		}
 
 		const nextEntry = this.plugin.engine.getAdjacentEntry(fileId, entryId, 1);
@@ -392,7 +492,7 @@ export class DictView extends ItemView {
 		});
 		nextBtn.disabled = !nextEntry;
 		if (nextEntry) {
-			nextBtn.addEventListener('click', () => this.openEntryDetail(fileId, nextEntry.id));
+			nextBtn.addEventListener('click', () => this.openEntryDetail(fileId, nextEntry.id, true));
 		}
 	}
 

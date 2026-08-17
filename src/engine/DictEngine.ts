@@ -263,6 +263,38 @@ export class DictEngine {
 	}
 
 	/**
+	 * Looks up a headword in a specific dictionary file.
+	 */
+	findEntryByHeadword(fileId: number, headword: string): { fileId: number; file: DictFileMetadata; entry: DictEntry } | null {
+		const file = this.files.find(f => f.id === fileId);
+		const bIdx = this.bigramIndexes.get(fileId);
+		if (!file || !bIdx) return null;
+
+		const entry = bIdx.findExact(headword);
+		if (entry) {
+			return { fileId, file, entry };
+		}
+		return null;
+	}
+
+	/**
+	 * Looks up a headword across all enabled dictionaries in order.
+	 */
+	findEntryInAnyDict(headword: string): { fileId: number; file: DictFileMetadata; entry: DictEntry } | null {
+		const activeFiles = this.files.filter(f => f.enabled);
+		for (const file of activeFiles) {
+			const bIdx = this.bigramIndexes.get(file.id);
+			if (bIdx) {
+				const entry = bIdx.findExact(headword);
+				if (entry) {
+					return { fileId: file.id, file, entry };
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Serializes the section indexes for caching in data.json.
 	 */
 	getCacheData(): Record<string, SectionIndex> {
