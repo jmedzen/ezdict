@@ -439,6 +439,20 @@
 	line-height: var(--line-height-normal, 1.72);
 	padding-right: 4px;
 	color: var(--text-normal);
+	user-select: text !important;
+	-webkit-user-select: text !important;
+	cursor: text;
+}
+
+.mdterm-detail-content * {
+	user-select: text !important;
+	-webkit-user-select: text !important;
+}
+
+.mdterm-detail-content a,
+.mdterm-detail-content button,
+.mdterm-detail-content input {
+	cursor: pointer;
 }
 
 .mdterm-detail-content h1,
