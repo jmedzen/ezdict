@@ -1,4 +1,4 @@
-import { App, FileSystemAdapter, Platform, requestUrl } from 'obsidian';
+import { App, Platform, requestUrl } from 'obsidian';
 import { unzipSync } from 'fflate';
 
 interface NodeFSSync {
@@ -35,6 +35,34 @@ export class DictDownloader {
 
 	constructor(app: App) {
 		this.app = app;
+	}
+
+	/**
+	 * Decodes raw zip filename by recovering bytes and applying UTF-8 / Big5 / GBK decoding.
+	 * Fixes mojibake when zip packages were created without standard UTF-8 bit flags.
+	 */
+	private decodeZipEntryName(name: string): string {
+		const bytes = new Uint8Array(name.length);
+		for (let i = 0; i < name.length; i++) {
+			bytes[i] = name.charCodeAt(i) & 0xff;
+		}
+
+		// 1. Try UTF-8 strict decoding
+		try {
+			return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+		} catch {
+			// 2. Try Big5 (Traditional Chinese)
+			try {
+				return new TextDecoder('big5').decode(bytes);
+			} catch {
+				// 3. Try GBK (Simplified Chinese)
+				try {
+					return new TextDecoder('gbk').decode(bytes);
+				} catch {
+					return name;
+				}
+			}
+		}
 	}
 
 	/**
@@ -86,13 +114,21 @@ export class DictDownloader {
 				throw new Error('ZIP 壓縮檔內沒有可用的檔案');
 			}
 
-			for (const relativePath of entries) {
+			for (const rawRelativePath of entries) {
+				const relativePath = this.decodeZipEntryName(rawRelativePath);
+
 				// Skip folder nodes and macOS metadata
-				if (relativePath.endsWith('/') || relativePath.includes('__MACOSX') || relativePath.endsWith('.DS_Store')) {
+				if (
+					relativePath.endsWith('/') ||
+					relativePath.includes('__MACOSX') ||
+					relativePath.endsWith('.DS_Store') ||
+					relativePath.includes('/._') ||
+					relativePath.startsWith('._')
+				) {
 					continue;
 				}
 
-				const fileData = unzipped[relativePath];
+				const fileData = unzipped[rawRelativePath];
 				const fileName = relativePath.split('/').pop() || relativePath;
 				if (!fileName) continue;
 
@@ -101,7 +137,7 @@ export class DictDownloader {
 			}
 
 			if (savedFiles.length === 0) {
-				throw new Error('ZIP 壓縮檔內未找到任何檔案');
+				throw new Error('ZIP 壓縮檔內未找到任何有效檔案');
 			}
 		} else {
 			// Single file download (e.g. .md dictionary)
