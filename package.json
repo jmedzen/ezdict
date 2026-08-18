@@ -1,6 +1,6 @@
 {
   "name": "ezdict",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "High-performance offline dictionary reader and lookup plugin, designed for massive markdown reference books and dictionaries.",
   "main": "main.js",
   "scripts": {
@@ -17,14 +17,14 @@
   ],
   "author": "jmedzen",
   "license": "MIT",
+  "dependencies": {
+    "fflate": "^0.8.2"
+  },
   "devDependencies": {
     "@types/node": "^20.14.0",
     "esbuild": "^0.23.0",
     "obsidian": "latest",
     "tslib": "^2.6.3",
     "typescript": "^5.4.5"
-  },
-  "dependencies": {
-    "fflate": "^0.8.3"
   }
 }
