@@ -696,3 +696,8 @@
 	margin-top: 2px;
 	line-height: var(--line-height-normal, 1.5);
 }
+
+/* ── Settings Custom Controls ───────────────────────────────── */
+.ezdict-settings-input {
+	min-width: 260px;
+}
