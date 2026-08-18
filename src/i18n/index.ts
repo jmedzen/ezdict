@@ -2,6 +2,10 @@ import { moment } from 'obsidian';
 import en from './locales/en';
 import zhTw from './locales/zh-tw';
 import zhCn from './locales/zh-cn';
+import es from './locales/es';
+import ja from './locales/ja';
+import ko from './locales/ko';
+import th from './locales/th';
 
 export type LocaleKey = keyof typeof en;
 
@@ -11,6 +15,10 @@ const locales: Record<string, Record<string, string>> = {
 	'zh-hk': zhTw,
 	'zh': zhCn,
 	'zh-cn': zhCn,
+	es,
+	ja,
+	ko,
+	th
 };
 
 /**
