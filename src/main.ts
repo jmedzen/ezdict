@@ -5,6 +5,7 @@ import { DictDownloader } from './services/DictDownloader';
 import { EzdictSettingTab } from './settings';
 import { EZDICT_VIEW_TYPE, DictView } from './views/DictView';
 import { DictSuggestModal } from './views/DictModal';
+import { t } from './i18n';
 
 export default class EzdictPlugin extends Plugin {
 	settings: EzdictSettings;
@@ -58,7 +59,7 @@ export default class EzdictPlugin extends Plugin {
 			editorCallback: (editor: Editor) => {
 				const selection = editor.getSelection().trim();
 				if (!selection) {
-					new Notice('請先選取要查詢的文字');
+					new Notice(t('notice.selectTextFirst'));
 					return;
 				}
 				void this.searchInSidebar(selection);
@@ -74,7 +75,7 @@ export default class EzdictPlugin extends Plugin {
 					menu.addItem((item) => {
 						const preview = selection.length > 10 ? selection.slice(0, 10) + '…' : selection;
 						item
-							.setTitle(`在 Ezdict 查詢「${preview}」`)
+							.setTitle(t('menu.searchInEzdict', { query: preview }))
 							.setIcon('book-open')
 							.onClick(() => {
 								void this.searchInSidebar(selection);

@@ -1,6 +1,7 @@
 import { ItemView, WorkspaceLeaf, MarkdownView, Editor, MarkdownRenderer, Component, setIcon, Notice } from 'obsidian';
 import type EzdictPlugin from '../main';
 import { DictEntry, DictFileMetadata, DictSearchMode, SearchResult } from '../types';
+import { t } from '../i18n';
 
 export const EZDICT_VIEW_TYPE = 'ezdict-dictionary-view';
 
@@ -67,7 +68,7 @@ export class DictView extends ItemView {
 
 		this.searchInputEl = searchWrapEl.createEl('input', {
 			type: 'text',
-			placeholder: '輸入關鍵詞查詢辭典…',
+			placeholder: t('search.placeholder'),
 			cls: 'ezdict-search-input'
 		});
 
@@ -88,7 +89,7 @@ export class DictView extends ItemView {
 
 		const clearBtn = searchWrapEl.createEl('button', {
 			cls: 'ezdict-search-clear-btn',
-			attr: { title: '清除' }
+			attr: { title: t('search.clear') }
 		});
 		setIcon(clearBtn, 'x');
 		clearBtn.addEventListener('click', () => {
@@ -108,7 +109,7 @@ export class DictView extends ItemView {
 		this.dictListToggleEl = toggleHeaderEl.createDiv({ cls: 'ezdict-dict-toggle-btn' });
 		const chevronSpan = this.dictListToggleEl.createSpan({ cls: 'ezdict-dict-chevron' });
 		setIcon(chevronSpan, 'chevron-right');
-		this.dictListToggleEl.createSpan({ cls: 'ezdict-dict-toggle-label', text: '📚 辭典選擇與排序' });
+		this.dictListToggleEl.createSpan({ cls: 'ezdict-dict-toggle-label', text: t('drawer.title') });
 
 		this.dictListDrawerEl = headerEl.createDiv({ cls: 'ezdict-dict-drawer collapsed' });
 
@@ -131,16 +132,16 @@ export class DictView extends ItemView {
 		this.entryDetailContainerEl = parent.createDiv({ cls: 'ezdict-entry-detail-container hidden' });
 
 		// Initial Placeholder
-		this.renderPlaceholder('輸入關鍵字開始查詢辭典…');
+		this.renderPlaceholder(t('view.initialPlaceholder'));
 	}
 
 	private renderModeTabs(): void {
 		this.modeTabsEl.empty();
 
 		const modes: { key: DictSearchMode; label: string }[] = [
-			{ key: 'prefix', label: '詞條' },
-			{ key: 'fuzzy', label: '模糊' },
-			{ key: 'fulltext', label: '全文' }
+			{ key: 'prefix', label: t('mode.tabPrefix') },
+			{ key: 'fuzzy', label: t('mode.tabFuzzy') },
+			{ key: 'fulltext', label: t('mode.tabFulltext') }
 		];
 
 		modes.forEach(m => {
@@ -163,12 +164,12 @@ export class DictView extends ItemView {
 		const files = this.plugin.engine.files;
 
 		if (files.length === 0) {
-			this.dictListDrawerEl.createDiv({ cls: 'ezdict-drawer-empty', text: '未掃描到辭典 .md 檔案，請檢查設定中的路徑。' });
+			this.dictListDrawerEl.createDiv({ cls: 'ezdict-drawer-empty', text: t('drawer.empty') });
 			return;
 		}
 
 		const actionsEl = this.dictListDrawerEl.createDiv({ cls: 'ezdict-drawer-actions' });
-		const allBtn = actionsEl.createEl('button', { cls: 'ezdict-drawer-action-btn', text: '切換全選' });
+		const allBtn = actionsEl.createEl('button', { cls: 'ezdict-drawer-action-btn', text: t('drawer.toggleAll') });
 		allBtn.addEventListener('click', () => {
 			void (async () => {
 				const allOn = files.every(f => f.enabled);
@@ -201,11 +202,11 @@ export class DictView extends ItemView {
 
 			// Title & Count
 			itemEl.createSpan({ cls: 'ezdict-drawer-item-name', text: f.name });
-			itemEl.createSpan({ cls: 'ezdict-drawer-item-count', text: `${f.entryCount.toLocaleString()} 條` });
+			itemEl.createSpan({ cls: 'ezdict-drawer-item-count', text: t('drawer.entriesCount', { count: f.entryCount.toLocaleString() }) });
 
 			// Up/Down Sort buttons
 			const sortBtnsEl = itemEl.createDiv({ cls: 'ezdict-drawer-sort-btns' });
-			const upBtn = sortBtnsEl.createEl('button', { cls: 'ezdict-drawer-sort-btn', attr: { title: '上移' } });
+			const upBtn = sortBtnsEl.createEl('button', { cls: 'ezdict-drawer-sort-btn', attr: { title: t('drawer.moveUp') } });
 			setIcon(upBtn, 'arrow-up');
 			upBtn.disabled = (idx === 0);
 			upBtn.addEventListener('click', () => {
@@ -223,7 +224,7 @@ export class DictView extends ItemView {
 				})();
 			});
 
-			const downBtn = sortBtnsEl.createEl('button', { cls: 'ezdict-drawer-sort-btn', attr: { title: '下移' } });
+			const downBtn = sortBtnsEl.createEl('button', { cls: 'ezdict-drawer-sort-btn', attr: { title: t('drawer.moveDown') } });
 			setIcon(downBtn, 'arrow-down');
 			downBtn.disabled = (idx === files.length - 1);
 			downBtn.addEventListener('click', () => {
@@ -254,12 +255,12 @@ export class DictView extends ItemView {
 		const q = query.trim();
 
 		if (!q) {
-			this.renderPlaceholder('輸入關鍵字開始查詢辭典…');
+			this.renderPlaceholder(t('view.initialPlaceholder'));
 			return;
 		}
 
 		if (!this.plugin.engine.isReady) {
-			this.renderPlaceholder('辭典載入索引中，請稍候…');
+			this.renderPlaceholder(t('view.indexingPlaceholder'));
 			return;
 		}
 
@@ -273,14 +274,14 @@ export class DictView extends ItemView {
 		// Perform Search
 		this.resultsContainerEl.empty();
 		const loadingEl = this.resultsContainerEl.createDiv({ cls: 'ezdict-loading-spinner' });
-		loadingEl.createSpan({ text: '檢索中…' });
+		loadingEl.createSpan({ text: t('setting.reindex.scanning') });
 
 		try {
 			const results = await this.plugin.engine.search(q, this.currentMode);
 			this.searchCache.set(this.currentMode, { query: q, results });
 			this.renderResults(results, q);
 		} catch {
-			this.renderPlaceholder('⚠️ 搜尋時發生錯誤');
+			this.renderPlaceholder(t('view.errorPlaceholder'));
 		}
 	}
 
@@ -288,13 +289,13 @@ export class DictView extends ItemView {
 		this.resultsContainerEl.empty();
 
 		if (results.length === 0) {
-			this.renderPlaceholder(`未找到與「${query}」相關的詞條`);
+			this.renderPlaceholder(t('view.noResultsPlaceholder', { query }));
 			return;
 		}
 
 		// Result Header Count
 		const countHeaderEl = this.resultsContainerEl.createDiv({ cls: 'ezdict-results-count-bar' });
-		countHeaderEl.setText(`找到 ${results.length.toLocaleString()} 筆結果`);
+		countHeaderEl.setText(t('view.resultsCount', { count: results.length.toLocaleString() }));
 
 		// Group results by Dictionary file
 		const grouped: Map<number, SearchResult[]> = new Map();
@@ -386,12 +387,12 @@ export class DictView extends ItemView {
 
 		this.entryDetailContainerEl.empty();
 		const loadingEl = this.entryDetailContainerEl.createDiv({ cls: 'ezdict-loading-spinner' });
-		loadingEl.createSpan({ text: '載入詞條中…' });
+		loadingEl.createSpan({ text: t('view.loadingEntry') });
 
 		const result = await this.plugin.engine.getEntryContent(fileId, entryId);
 		if (!result) {
 			this.entryDetailContainerEl.empty();
-			this.entryDetailContainerEl.createDiv({ cls: 'ezdict-placeholder', text: '⚠️ 無法讀取詞條內容' });
+			this.entryDetailContainerEl.createDiv({ cls: 'ezdict-placeholder', text: t('view.readError') });
 			return;
 		}
 
@@ -402,10 +403,10 @@ export class DictView extends ItemView {
 
 		const backBtn = navHeaderEl.createEl('button', {
 			cls: 'ezdict-detail-nav-btn',
-			attr: { title: '返回搜尋結果' }
+			attr: { title: t('nav.backTitle') }
 		});
 		setIcon(backBtn, 'arrow-left');
-		backBtn.createSpan({ text: '返回' });
+		backBtn.createSpan({ text: t('nav.back') });
 		backBtn.addEventListener('click', () => {
 			this.entryHistory = [];
 			this.showResultsView();
@@ -416,16 +417,16 @@ export class DictView extends ItemView {
 		// Actions (Copy / Insert into note)
 		const actionsEl = navHeaderEl.createDiv({ cls: 'ezdict-detail-actions' });
 
-		const quoteBtn = actionsEl.createEl('button', { cls: 'ezdict-action-icon-btn', attr: { title: '引用並插入筆記' } });
+		const quoteBtn = actionsEl.createEl('button', { cls: 'ezdict-action-icon-btn', attr: { title: t('action.quote') } });
 		setIcon(quoteBtn, 'quote');
 		quoteBtn.addEventListener('click', () => this.insertEntryIntoActiveNote(result.entry, result.file, result.content));
 
-		const copyBtn = actionsEl.createEl('button', { cls: 'ezdict-action-icon-btn', attr: { title: '複製內文' } });
+		const copyBtn = actionsEl.createEl('button', { cls: 'ezdict-action-icon-btn', attr: { title: t('action.copy') } });
 		setIcon(copyBtn, 'copy');
 		copyBtn.addEventListener('click', () => {
 			void (async () => {
 				await navigator.clipboard.writeText(result.content);
-				new Notice('✅ 已複製辭典內文');
+				new Notice(t('notice.copied'));
 			})();
 		});
 
@@ -470,7 +471,7 @@ export class DictView extends ItemView {
 				if (found) {
 					await this.openEntryDetail(found.fileId, found.entry.id, true);
 				} else {
-					new Notice(`🔍 辭典中未找到完全相符的詞條「${targetText}」，改為搜尋…`);
+					new Notice(t('notice.exactNotFound', { query: targetText }));
 					await this.searchExternal(targetText);
 				}
 			})();
@@ -482,12 +483,12 @@ export class DictView extends ItemView {
 		const prevEntry = this.plugin.engine.getAdjacentEntry(fileId, entryId, -1);
 		const prevBtn = paginationEl.createEl('button', {
 			cls: 'ezdict-pagination-btn ezdict-pagination-btn-prev',
-			attr: { title: prevEntry ? `前一條: ${prevEntry.cleanHeadword}` : '已是第一條' }
+			attr: { title: prevEntry ? t('nav.prevTitle', { headword: prevEntry.cleanHeadword }) : t('nav.first') }
 		});
 		prevBtn.createSpan({ cls: 'ezdict-pagination-arrow', text: '←' });
 		prevBtn.createSpan({
 			cls: 'ezdict-pagination-label',
-			text: prevEntry ? prevEntry.cleanHeadword : '第一條'
+			text: prevEntry ? prevEntry.cleanHeadword : t('nav.first')
 		});
 		prevBtn.disabled = !prevEntry;
 		if (prevEntry) {
@@ -499,11 +500,11 @@ export class DictView extends ItemView {
 		const nextEntry = this.plugin.engine.getAdjacentEntry(fileId, entryId, 1);
 		const nextBtn = paginationEl.createEl('button', {
 			cls: 'ezdict-pagination-btn ezdict-pagination-btn-next',
-			attr: { title: nextEntry ? `後一條: ${nextEntry.cleanHeadword}` : '已是最後一條' }
+			attr: { title: nextEntry ? t('nav.nextTitle', { headword: nextEntry.cleanHeadword }) : t('nav.last') }
 		});
 		nextBtn.createSpan({
 			cls: 'ezdict-pagination-label',
-			text: nextEntry ? nextEntry.cleanHeadword : '最後一條'
+			text: nextEntry ? nextEntry.cleanHeadword : t('nav.last')
 		});
 		nextBtn.createSpan({ cls: 'ezdict-pagination-arrow', text: '→' });
 		nextBtn.disabled = !nextEntry;
@@ -561,11 +562,11 @@ export class DictView extends ItemView {
 		if (targetEditor) {
 			targetEditor.focus();
 			targetEditor.replaceSelection(insertText);
-			new Notice(`✅ 已成功插入《${file.name}》【${entry.cleanHeadword}】`);
+			new Notice(t('notice.inserted', { dict: file.name, entry: entry.cleanHeadword }));
 		} else {
 			void (async () => {
 				await navigator.clipboard.writeText(insertText);
-				new Notice(`📋 目前未開啟任何筆記編輯器，已將引用複製至剪貼簿！`);
+				new Notice(t('notice.clipboardFallback'));
 			})();
 		}
 	}

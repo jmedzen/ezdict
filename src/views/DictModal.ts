@@ -2,6 +2,7 @@ import { App, SuggestModal } from 'obsidian';
 import type EzdictPlugin from '../main';
 import { SearchResult } from '../types';
 import { EZDICT_VIEW_TYPE, DictView } from './DictView';
+import { t } from '../i18n';
 
 export class DictSuggestModal extends SuggestModal<SearchResult> {
 	plugin: EzdictPlugin;
@@ -11,7 +12,7 @@ export class DictSuggestModal extends SuggestModal<SearchResult> {
 		super(app);
 		this.plugin = plugin;
 		this.initialQuery = initialQuery;
-		this.setPlaceholder('輸入關鍵詞查詢辭典… (支援空白多詞 AND 檢索)');
+		this.setPlaceholder(t('search.placeholderModal'));
 	}
 
 	onOpen(): void {

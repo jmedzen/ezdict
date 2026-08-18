@@ -1,6 +1,7 @@
 import { App, Notice, PluginSettingTab, Setting, SettingDefinitionItem } from 'obsidian';
 import type EzdictPlugin from './main';
 import { DictSearchMode } from './types';
+import { t } from './i18n';
 
 const SAMPLE_DICT_URL = 'https://dl.mahabodhi.co/downloadFile?id=Kqf9yp2wb0PRgLV';
 
@@ -19,43 +20,43 @@ export class EzdictSettingTab extends PluginSettingTab {
 		return [
 			{
 				type: 'group',
-				heading: '辭典目錄與索引 (Dictionaries & Index)',
+				heading: t('group.dictAndIndex'),
 				items: [
 					{
-						name: '辭典目錄路徑 (Dictionary Path)',
-						desc: '存放 .md 辭典檔案的資料夾路徑。支援 Vault 內部相對路徑（如 dictionary_folder）或電腦上的絕對路徑。',
+						name: t('setting.dictPath.name'),
+						desc: t('setting.dictPath.desc'),
 						control: {
 							type: 'text',
 							key: 'dictDirectory',
-							placeholder: '例如: dictionary_folder 或 /Users/jm/dictionary_folder'
+							placeholder: t('setting.dictPath.placeholder')
 						}
 					},
 					{
-						name: '詞條標題層級 (Entry Heading Level)',
-						desc: '定義 Markdown 中作為獨立詞條開頭的標題層級（預設為 h3 ###）。修改後將自動重新掃描辭典檔案並更新索引。',
+						name: t('setting.headingLevel.name'),
+						desc: t('setting.headingLevel.desc'),
 						control: {
 							type: 'dropdown',
 							key: 'entryHeadingLevel',
 							options: {
-								'2': 'h2 (## 標題二)',
-								'3': 'h3 (### 標題三 - 預設)',
-								'4': 'h4 (#### 標題四)',
-								'5': 'h5 (##### 標題五)',
-								'6': 'h6 (###### 標題六)',
-								'0': '自動偵測 (Auto-Detect 最深層級)'
+								'2': t('setting.headingLevel.h2'),
+								'3': t('setting.headingLevel.h3'),
+								'4': t('setting.headingLevel.h4'),
+								'5': t('setting.headingLevel.h5'),
+								'6': t('setting.headingLevel.h6'),
+								'0': t('setting.headingLevel.auto')
 							}
 						}
 					},
 					{
-						name: '下載範例辭典 (Download Sample Dictionaries)',
-						desc: '一鍵下載官方精選範例辭典包（包含常用辭典 .md 檔案），自動解壓縮至辭典目錄並建立索引。',
+						name: t('setting.downloadSample.name'),
+						desc: t('setting.downloadSample.desc'),
 						render: (setting: Setting) => {
 							this.buildDownloadSampleControl(setting);
 						}
 					},
 					{
-						name: '重新建立辭典索引',
-						desc: '當您新增或更新了辭典 .md 檔案後，點擊此按鈕立即重新掃描並更新快取。',
+						name: t('setting.reindex.name'),
+						desc: t('setting.reindex.desc'),
 						render: (setting: Setting) => {
 							this.buildReindexControl(setting);
 						}
@@ -64,24 +65,24 @@ export class EzdictSettingTab extends PluginSettingTab {
 			},
 			{
 				type: 'group',
-				heading: '搜尋與引用 (Search & Citation)',
+				heading: t('group.searchAndCitation'),
 				items: [
 					{
-						name: '預設搜尋模式 (Default Search Mode)',
-						desc: '開啟面板或進行查詢時的預設模式。',
+						name: t('setting.defaultMode.name'),
+						desc: t('setting.defaultMode.desc'),
 						control: {
 							type: 'dropdown',
 							key: 'defaultMode',
 							options: {
-								'prefix': '📖 詞條前綴 (Prefix - 0延遲)',
-								'fuzzy': '🔍 詞條模糊 (Fuzzy - 包含子字串)',
-								'fulltext': '📑 內文全文 (Full-Text - 內文檢索)'
+								'prefix': t('mode.prefix'),
+								'fuzzy': t('mode.fuzzy'),
+								'fulltext': t('mode.fulltext')
 							}
 						}
 					},
 					{
-						name: '每本辭典最大搜尋筆數',
-						desc: '限制每本辭典回傳之最大結果數量（預設 350 筆）。',
+						name: t('setting.maxResults.name'),
+						desc: t('setting.maxResults.desc'),
 						control: {
 							type: 'slider',
 							key: 'maxResultsPerDict',
@@ -91,8 +92,8 @@ export class EzdictSettingTab extends PluginSettingTab {
 						}
 					},
 					{
-						name: '搜尋鄰近詞距上限 (Proximity Distance)',
-						desc: '全文檢索多關鍵詞 (AND 查詢) 時允許的最大字元距離。',
+						name: t('setting.proximityDistance.name'),
+						desc: t('setting.proximityDistance.desc'),
 						control: {
 							type: 'slider',
 							key: 'maxProximityDistance',
@@ -102,22 +103,22 @@ export class EzdictSettingTab extends PluginSettingTab {
 						}
 					},
 					{
-						name: '一鍵引用插入格式 (Citation Template)',
-						desc: '點擊「插入筆記」時的格式樣板。',
+						name: t('setting.citationTemplate.name'),
+						desc: t('setting.citationTemplate.desc'),
 						control: {
 							type: 'dropdown',
 							key: 'citationTemplate',
 							options: {
-								'blockquote': '引用區塊 (> 釋義)',
-								'footnote': '腳註引用 ([^詞條]: 釋義)',
-								'wikilink': '雙向連結 ([[詞條]])',
-								'raw': '原始文字'
+								'blockquote': t('citation.blockquote'),
+								'footnote': t('citation.footnote'),
+								'wikilink': t('citation.wikilink'),
+								'raw': t('citation.raw')
 							}
 						}
 					},
 					{
-						name: '啟用編輯器右鍵選單劃詞即查',
-						desc: '選取文字後，右鍵選單顯示「在 Ezdict 查詢」項目。',
+						name: t('setting.selectionMenu.name'),
+						desc: t('setting.selectionMenu.desc'),
 						control: {
 							type: 'toggle',
 							key: 'enableSelectionMenu'
@@ -150,11 +151,11 @@ export class EzdictSettingTab extends PluginSettingTab {
 
 	private buildDownloadSampleControl(setting: Setting): void {
 		setting.addButton(button => button
-			.setButtonText('⬇️ 下載範例辭典')
+			.setButtonText(t('setting.downloadSample.btn'))
 			.setCta()
 			.onClick(async () => {
 				button.setDisabled(true);
-				button.setButtonText('連線下載中…');
+				button.setButtonText(t('setting.downloadSample.connecting'));
 
 				try {
 					const result = await this.plugin.downloader.downloadAndImport(
@@ -166,22 +167,22 @@ export class EzdictSettingTab extends PluginSettingTab {
 					);
 
 					new Notice(result.message, 6000);
-					button.setButtonText('更新索引中…');
+					button.setButtonText(t('setting.reindex.scanning'));
 					await this.plugin.engine.initialize();
 					await this.plugin.saveIndexCache();
 
-					button.setButtonText('✅ 下載完成');
+					button.setButtonText(t('setting.downloadSample.done'));
 					window.setTimeout(() => {
 						button.setDisabled(false);
-						button.setButtonText('⬇️ 下載範例辭典');
+						button.setButtonText(t('setting.downloadSample.btn'));
 					}, 3000);
 				} catch (err) {
 					const errMsg = err instanceof Error ? err.message : String(err);
-					new Notice(`❌ 下載失敗: ${errMsg}`, 7000);
+					new Notice(`❌ ${errMsg}`, 7000);
 					button.setDisabled(false);
-					button.setButtonText('❌ 下載重試');
+					button.setButtonText(t('setting.downloadSample.retry'));
 					window.setTimeout(() => {
-						button.setButtonText('⬇️ 下載範例辭典');
+						button.setButtonText(t('setting.downloadSample.btn'));
 					}, 3000);
 				}
 			}));
@@ -189,15 +190,15 @@ export class EzdictSettingTab extends PluginSettingTab {
 
 	private buildReindexControl(setting: Setting): void {
 		setting.addButton(button => button
-			.setButtonText('🔄 立即重新掃描索引')
+			.setButtonText(t('setting.reindex.btn'))
 			.onClick(async () => {
 				button.setDisabled(true);
-				button.setButtonText('掃描中…');
+				button.setButtonText(t('setting.reindex.scanning'));
 				await this.plugin.engine.initialize();
 				await this.plugin.saveIndexCache();
 				button.setDisabled(false);
-				button.setButtonText('✅ 掃描完成');
-				window.setTimeout(() => button.setButtonText('🔄 立即重新掃描索引'), 2500);
+				button.setButtonText(t('setting.reindex.done'));
+				window.setTimeout(() => button.setButtonText(t('setting.reindex.btn')), 2500);
 			}));
 	}
 
@@ -210,15 +211,15 @@ export class EzdictSettingTab extends PluginSettingTab {
 
 		// Section 1: Dictionaries & Index
 		new Setting(containerEl)
-			.setName('辭典目錄與索引 (Dictionaries & Index)')
+			.setName(t('group.dictAndIndex'))
 			.setHeading();
 
 		// 1. Dictionary Directory Setting
 		new Setting(containerEl)
-			.setName('辭典目錄路徑 (Dictionary Path)')
-			.setDesc('存放 .md 辭典檔案的資料夾路徑。支援 Vault 內部相對路徑（如 dictionary_folder）或電腦上的絕對路徑。')
+			.setName(t('setting.dictPath.name'))
+			.setDesc(t('setting.dictPath.desc'))
 			.addText(text => text
-				.setPlaceholder('例如: dictionary_folder 或 /Users/jm/dictionary_folder')
+				.setPlaceholder(t('setting.dictPath.placeholder'))
 				.setValue(this.plugin.settings.dictDirectory)
 				.onChange(async (value) => {
 					this.plugin.settings.dictDirectory = value.trim();
@@ -228,15 +229,15 @@ export class EzdictSettingTab extends PluginSettingTab {
 
 		// 2. Entry Heading Level Setting (h2 ~ h6)
 		new Setting(containerEl)
-			.setName('詞條標題層級 (Entry Heading Level)')
-			.setDesc('定義 Markdown 中作為獨立詞條開頭的標題層級（預設為 h3 ###）。修改後將自動重新掃描辭典檔案並更新索引。')
+			.setName(t('setting.headingLevel.name'))
+			.setDesc(t('setting.headingLevel.desc'))
 			.addDropdown(dropdown => dropdown
-				.addOption('2', 'h2 (## 標題二)')
-				.addOption('3', 'h3 (### 標題三 - 預設)')
-				.addOption('4', 'h4 (#### 標題四)')
-				.addOption('5', 'h5 (##### 標題五)')
-				.addOption('6', 'h6 (###### 標題六)')
-				.addOption('0', '自動偵測 (Auto-Detect 最深層級)')
+				.addOption('2', t('setting.headingLevel.h2'))
+				.addOption('3', t('setting.headingLevel.h3'))
+				.addOption('4', t('setting.headingLevel.h4'))
+				.addOption('5', t('setting.headingLevel.h5'))
+				.addOption('6', t('setting.headingLevel.h6'))
+				.addOption('0', t('setting.headingLevel.auto'))
 				.setValue(String(this.plugin.settings.entryHeadingLevel ?? 3))
 				.onChange(async (value) => {
 					this.plugin.settings.entryHeadingLevel = parseInt(value, 10);
@@ -247,29 +248,29 @@ export class EzdictSettingTab extends PluginSettingTab {
 
 		// 3. Download Sample Dictionaries Setting
 		const downloadSampleSetting = new Setting(containerEl)
-			.setName('下載範例辭典 (Download Sample Dictionaries)')
-			.setDesc('一鍵下載官方精選範例辭典包（包含常用辭典 .md 檔案），自動解壓縮至辭典目錄並建立索引。');
+			.setName(t('setting.downloadSample.name'))
+			.setDesc(t('setting.downloadSample.desc'));
 		this.buildDownloadSampleControl(downloadSampleSetting);
 
 		// 4. Manual Re-index Button
 		const reindexSetting = new Setting(containerEl)
-			.setName('重新建立辭典索引')
-			.setDesc('當您新增或更新了辭典 .md 檔案後，點擊此按鈕立即重新掃描並更新快取。');
+			.setName(t('setting.reindex.name'))
+			.setDesc(t('setting.reindex.desc'));
 		this.buildReindexControl(reindexSetting);
 
 		// Section 2: Search & Citation
 		new Setting(containerEl)
-			.setName('搜尋與引用 (Search & Citation)')
+			.setName(t('group.searchAndCitation'))
 			.setHeading();
 
 		// 5. Default Search Mode
 		new Setting(containerEl)
-			.setName('預設搜尋模式 (Default Search Mode)')
-			.setDesc('開啟面板或進行查詢時的預設模式。')
+			.setName(t('setting.defaultMode.name'))
+			.setDesc(t('setting.defaultMode.desc'))
 			.addDropdown(dropdown => dropdown
-				.addOption('prefix', '📖 詞條前綴 (Prefix - 0延遲)')
-				.addOption('fuzzy', '🔍 詞條模糊 (Fuzzy - 包含子字串)')
-				.addOption('fulltext', '📑 內文全文 (Full-Text - 內文檢索)')
+				.addOption('prefix', t('mode.prefix'))
+				.addOption('fuzzy', t('mode.fuzzy'))
+				.addOption('fulltext', t('mode.fulltext'))
 				.setValue(this.plugin.settings.defaultMode)
 				.onChange(async (value) => {
 					this.plugin.settings.defaultMode = value as DictSearchMode;
@@ -278,8 +279,8 @@ export class EzdictSettingTab extends PluginSettingTab {
 
 		// 6. Max Results
 		new Setting(containerEl)
-			.setName('每本辭典最大搜尋筆數')
-			.setDesc('限制每本辭典回傳之最大結果數量（預設 350 筆）。')
+			.setName(t('setting.maxResults.name'))
+			.setDesc(t('setting.maxResults.desc'))
 			.addSlider(slider => slider
 				.setLimits(20, 1000, 10)
 				.setValue(this.plugin.settings.maxResultsPerDict)
@@ -290,8 +291,8 @@ export class EzdictSettingTab extends PluginSettingTab {
 
 		// 7. Proximity Distance
 		new Setting(containerEl)
-			.setName('搜尋鄰近詞距上限 (Proximity Distance)')
-			.setDesc('全文檢索多關鍵詞 (AND 查詢) 時允許的最大字元距離。')
+			.setName(t('setting.proximityDistance.name'))
+			.setDesc(t('setting.proximityDistance.desc'))
 			.addSlider(slider => slider
 				.setLimits(20, 500, 10)
 				.setValue(this.plugin.settings.maxProximityDistance)
@@ -302,13 +303,13 @@ export class EzdictSettingTab extends PluginSettingTab {
 
 		// 8. Citation / Insert Format
 		new Setting(containerEl)
-			.setName('一鍵引用插入格式 (Citation Template)')
-			.setDesc('點擊「插入筆記」時的格式樣板。')
+			.setName(t('setting.citationTemplate.name'))
+			.setDesc(t('setting.citationTemplate.desc'))
 			.addDropdown(dropdown => dropdown
-				.addOption('blockquote', '引用區塊 (> 釋義)')
-				.addOption('footnote', '腳註引用 ([^詞條]: 釋義)')
-				.addOption('wikilink', '雙向連結 ([[詞條]])')
-				.addOption('raw', '原始文字')
+				.addOption('blockquote', t('citation.blockquote'))
+				.addOption('footnote', t('citation.footnote'))
+				.addOption('wikilink', t('citation.wikilink'))
+				.addOption('raw', t('citation.raw'))
 				.setValue(this.plugin.settings.citationTemplate)
 				.onChange(async (value) => {
 					this.plugin.settings.citationTemplate = value;
@@ -317,8 +318,8 @@ export class EzdictSettingTab extends PluginSettingTab {
 
 		// 9. Right-click context menu
 		new Setting(containerEl)
-			.setName('啟用編輯器右鍵選單劃詞即查')
-			.setDesc('選取文字後，右鍵選單顯示「在 Ezdict 查詢」項目。')
+			.setName(t('setting.selectionMenu.name'))
+			.setDesc(t('setting.selectionMenu.desc'))
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.enableSelectionMenu)
 				.onChange(async (value) => {
