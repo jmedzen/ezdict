@@ -1,6 +1,7 @@
 import { Plugin, WorkspaceLeaf, Editor, Menu, Notice } from 'obsidian';
 import { DEFAULT_SETTINGS, EzdictSettings, SectionIndex } from './types';
 import { DictEngine } from './engine/DictEngine';
+import { DictDownloader } from './services/DictDownloader';
 import { EzdictSettingTab } from './settings';
 import { EZDICT_VIEW_TYPE, DictView } from './views/DictView';
 import { DictSuggestModal } from './views/DictModal';
@@ -8,11 +9,13 @@ import { DictSuggestModal } from './views/DictModal';
 export default class EzdictPlugin extends Plugin {
 	settings: EzdictSettings;
 	engine: DictEngine;
+	downloader: DictDownloader;
 
 	async onload(): Promise<void> {
 		await this.loadSettings();
 
-		// Initialize Dictionary Engine
+		// Initialize Downloader & Dictionary Engine
+		this.downloader = new DictDownloader(this.app);
 		this.engine = new DictEngine(this.app, this.settings);
 
 		// Register Sidebar View

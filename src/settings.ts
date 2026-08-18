@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting, SettingDefinitionItem } from 'obsidian';
+import { App, Notice, PluginSettingTab, Setting, SettingDefinitionItem } from 'obsidian';
 import type EzdictPlugin from './main';
 import { DictSearchMode } from './types';
 
@@ -43,6 +43,10 @@ export class EzdictSettingTab extends PluginSettingTab {
 								'0': '自動偵測 (Auto-Detect 最深層級)'
 							}
 						}
+					},
+					{
+						name: '從網址下載辭典 (Download Dictionary from URL)',
+						desc: '輸入辭典檔案（.md 或 .zip）的直接下載網址。若是 .zip 壓縮包，將自動解壓縮至辭典目錄並刪除 .zip 檔案。'
 					},
 					{
 						name: '重新建立辭典索引',
@@ -190,13 +194,63 @@ export class EzdictSettingTab extends PluginSettingTab {
 					await this.plugin.saveIndexCache();
 				}));
 
-		// 3. Manual Re-index Button
+		// 3. Download Dictionary from URL Setting
+		let downloadUrlInput = '';
+		new Setting(containerEl)
+			.setName('從網址下載辭典 (Download Dictionary from URL)')
+			.setDesc('輸入辭典檔案（.md 或 .zip）的直接下載網址。若是 .zip 壓縮包，將自動解壓縮至辭典目錄並刪除 .zip 檔案。')
+			.addText(text => text
+				.setPlaceholder('https://example.com/dictionaries.zip')
+				.onChange(value => {
+					downloadUrlInput = value.trim();
+				}))
+			.addButton(button => button
+				.setButtonText('⬇️ 下載並匯入')
+				.setCta()
+				.onClick(async () => {
+					if (!downloadUrlInput) {
+						new Notice('⚠️ 請先輸入辭典下載網址');
+						return;
+					}
+					button.setDisabled(true);
+					button.setButtonText('下載中…');
+
+					try {
+						const result = await this.plugin.downloader.downloadAndImport(
+							downloadUrlInput,
+							this.plugin.settings.dictDirectory,
+							(status) => {
+								button.setButtonText(status);
+							}
+						);
+
+						new Notice(result.message, 6000);
+						button.setButtonText('更新索引中…');
+						await this.plugin.engine.initialize();
+						await this.plugin.saveIndexCache();
+
+						button.setButtonText('✅ 匯入完成');
+						window.setTimeout(() => {
+							button.setDisabled(false);
+							button.setButtonText('⬇️ 下載並匯入');
+						}, 3000);
+					} catch (err) {
+						const errMsg = err instanceof Error ? err.message : String(err);
+						new Notice(`❌ 下載失敗: ${errMsg}`, 7000);
+						button.setDisabled(false);
+						button.setButtonText('❌ 下載重試');
+						window.setTimeout(() => {
+							button.setButtonText('⬇️ 下載並匯入');
+						}, 3000);
+					}
+				}));
+
+		// 4. Manual Re-index Button
 		new Setting(containerEl)
 			.setName('重新建立辭典索引')
 			.setDesc('當您新增或更新了辭典 .md 檔案後，點擊此按鈕立即重新掃描並更新快取。')
 			.addButton(button => button
 				.setButtonText('🔄 立即重新掃描索引')
-				.setCta()
 				.onClick(async () => {
 					button.setDisabled(true);
 					button.setButtonText('掃描中…');
@@ -212,7 +266,7 @@ export class EzdictSettingTab extends PluginSettingTab {
 			.setName('搜尋與引用 (Search & Citation)')
 			.setHeading();
 
-		// 4. Default Search Mode
+		// 5. Default Search Mode
 		new Setting(containerEl)
 			.setName('預設搜尋模式 (Default Search Mode)')
 			.setDesc('開啟面板或進行查詢時的預設模式。')
@@ -226,7 +280,7 @@ export class EzdictSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				}));
 
-		// 5. Max Results
+		// 6. Max Results
 		new Setting(containerEl)
 			.setName('每本辭典最大搜尋筆數')
 			.setDesc('限制每本辭典回傳之最大結果數量（預設 350 筆）。')
@@ -238,7 +292,7 @@ export class EzdictSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				}));
 
-		// 6. Proximity Distance
+		// 7. Proximity Distance
 		new Setting(containerEl)
 			.setName('搜尋鄰近詞距上限 (Proximity Distance)')
 			.setDesc('全文檢索多關鍵詞 (AND 查詢) 時允許的最大字元距離。')
@@ -250,7 +304,7 @@ export class EzdictSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				}));
 
-		// 7. Citation / Insert Format
+		// 8. Citation / Insert Format
 		new Setting(containerEl)
 			.setName('一鍵引用插入格式 (Citation Template)')
 			.setDesc('點擊「插入筆記」時的格式樣板。')
@@ -265,7 +319,7 @@ export class EzdictSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				}));
 
-		// 8. Right-click context menu
+		// 9. Right-click context menu
 		new Setting(containerEl)
 			.setName('啟用編輯器右鍵選單劃詞即查')
 			.setDesc('選取文字後，右鍵選單顯示「在 Ezdict 查詢」項目。')
