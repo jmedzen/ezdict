@@ -77,8 +77,8 @@ export default {
 	'notice.clipboardFallback': '📋 ¡No hay ningún editor activo abierto, cita copiada al portapapeles!',
 	'notice.exactNotFound': '🔍 No se encontró coincidencia exacta para "{query}", buscando en su lugar…',
 	'notice.selectTextFirst': 'Seleccione primero el texto a buscar',
-	'command.openSidebar': 'show md dictionary panel',
-	'command.quickLookup': 'quick dictionary lookup (modal)',
-	'command.lookupSelection': 'search selection in dictionary panel',
+	'command.openSidebar': 'Mostrar panel de diccionario',
+	'command.quickLookup': 'Búsqueda rápida en diccionario (modal)',
+	'command.lookupSelection': 'Buscar selección en panel de diccionario',
 	'menu.searchInEzdict': 'Buscar en Ezdict: "{query}"'
 };

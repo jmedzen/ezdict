@@ -77,8 +77,8 @@ export default {
 	'notice.clipboardFallback': '📋 No active editor open, quote copied to clipboard!',
 	'notice.exactNotFound': '🔍 Exact match for "{query}" not found, searching instead…',
 	'notice.selectTextFirst': 'Please select text to search first',
-	'command.openSidebar': 'show md dictionary panel',
-	'command.quickLookup': 'quick dictionary lookup (modal)',
-	'command.lookupSelection': 'search selection in dictionary panel',
+	'command.openSidebar': 'Show dictionary panel',
+	'command.quickLookup': 'Quick dictionary lookup (modal)',
+	'command.lookupSelection': 'Search selection in dictionary panel',
 	'menu.searchInEzdict': 'Search in Ezdict: "{query}"'
 };

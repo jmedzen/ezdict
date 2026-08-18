@@ -77,8 +77,8 @@ export default {
 	'notice.clipboardFallback': '📋 활성화된 에디터가 없어 인용문이 클립보드에 복사되었습니다!',
 	'notice.exactNotFound': '🔍 정확히 일치하는 「{query}」 표제어가 없어 검색으로 전환합니다…',
 	'notice.selectTextFirst': '먼저 검색할 텍스트를 선택하세요',
-	'command.openSidebar': 'show md dictionary panel',
-	'command.quickLookup': 'quick dictionary lookup (modal)',
-	'command.lookupSelection': 'search selection in dictionary panel',
+	'command.openSidebar': '사전 사이드바 패널 열기',
+	'command.quickLookup': '빠른 사전 조회 (모달)',
+	'command.lookupSelection': '선택한 텍스트 사전 패널에서 검색',
 	'menu.searchInEzdict': 'Ezdict에서 검색: 「{query}」'
 };

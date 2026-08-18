@@ -77,8 +77,8 @@ export default {
 	'notice.clipboardFallback': '📋 目前未開啟任何筆記編輯器，已將引用複製至剪貼簿！',
 	'notice.exactNotFound': '🔍 辭典中未找到完全相符的詞條「{query}」，改為搜尋…',
 	'notice.selectTextFirst': '請先選取要查詢的文字',
-	'command.openSidebar': 'show md dictionary panel',
-	'command.quickLookup': 'quick dictionary lookup (modal)',
-	'command.lookupSelection': 'search selection in dictionary panel',
+	'command.openSidebar': '開啟辭典側邊欄面板',
+	'command.quickLookup': '快速辭典查詢 (彈窗)',
+	'command.lookupSelection': '在辭典面板中查詢選取文字',
 	'menu.searchInEzdict': '在 Ezdict 查詢: 「{query}」'
 };

@@ -77,8 +77,8 @@ export default {
 	'notice.clipboardFallback': '📋 アクティブなエディタがないため、引用をクリップボードにコピーしました！',
 	'notice.exactNotFound': '🔍 完全一致する項目「{query}」が見つからないため、検索に切り替えます…',
 	'notice.selectTextFirst': '検索するテキストを選択してください',
-	'command.openSidebar': 'show md dictionary panel',
-	'command.quickLookup': 'quick dictionary lookup (modal)',
-	'command.lookupSelection': 'search selection in dictionary panel',
+	'command.openSidebar': '辞書サイドバーパネルを表示',
+	'command.quickLookup': 'クイック辞書検索 (モーダル)',
+	'command.lookupSelection': '選択テキストを辞書パネルで検索',
 	'menu.searchInEzdict': 'Ezdict で検索: 「{query}」'
 };

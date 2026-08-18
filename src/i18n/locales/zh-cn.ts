@@ -77,8 +77,8 @@ export default {
 	'notice.clipboardFallback': '📋 当前未打开任何笔记编辑器，已将引用复制至剪贴板！',
 	'notice.exactNotFound': '🔍 词典中未找到完全匹配的词条「{query}」，改为搜索…',
 	'notice.selectTextFirst': '请先选取要查询的文本',
-	'command.openSidebar': 'show md dictionary panel',
-	'command.quickLookup': 'quick dictionary lookup (modal)',
-	'command.lookupSelection': 'search selection in dictionary panel',
+	'command.openSidebar': '打开词典侧边栏面板',
+	'command.quickLookup': '快速词典查询 (弹窗)',
+	'command.lookupSelection': '在词典面板中查询选取文本',
 	'menu.searchInEzdict': '在 Ezdict 查询: 「{query}」'
 };

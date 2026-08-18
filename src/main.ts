@@ -33,7 +33,7 @@ export default class EzdictPlugin extends Plugin {
 		// Register Command: Open Sidebar View (ID without plugin prefix per guidelines)
 		this.addCommand({
 			id: 'open-sidebar',
-			name: 'show md dictionary panel',
+			name: t('command.openSidebar'),
 			callback: () => {
 				void this.activateSidebarView();
 			}
@@ -42,7 +42,7 @@ export default class EzdictPlugin extends Plugin {
 		// Register Command: Quick Lookup Modal
 		this.addCommand({
 			id: 'quick-dict-lookup',
-			name: 'quick dictionary lookup (modal)',
+			name: t('command.quickLookup'),
 			editorCallback: (editor: Editor) => {
 				const selection = editor.getSelection().trim();
 				new DictSuggestModal(this.app, this, selection).open();
@@ -55,7 +55,7 @@ export default class EzdictPlugin extends Plugin {
 		// Register Command: Lookup Selection in Sidebar
 		this.addCommand({
 			id: 'lookup-selection-in-sidebar',
-			name: 'search selection in dictionary panel',
+			name: t('command.lookupSelection'),
 			editorCallback: (editor: Editor) => {
 				const selection = editor.getSelection().trim();
 				if (!selection) {

@@ -77,8 +77,8 @@ export default {
 	'notice.clipboardFallback': '📋 ไม่มีตัวแก้ไขที่เปิดอยู่ ได้คัดลอกการอ้างอิงไปยังคลิปบอร์ดแล้ว!',
 	'notice.exactNotFound': '🔍 ไม่พบคําที่ตรงเป๊ะสําหรับ "{query}" เปลี่ยนเป็นการค้นหาแทน…',
 	'notice.selectTextFirst': 'โปรดเลือกข้อความที่จะค้นหาก่อน',
-	'command.openSidebar': 'show md dictionary panel',
-	'command.quickLookup': 'quick dictionary lookup (modal)',
-	'command.lookupSelection': 'search selection in dictionary panel',
+	'command.openSidebar': 'เปิดแผงพจนานุกรมแถบข้าง',
+	'command.quickLookup': 'ค้นหาพจนานุกรมด่วน (หน้าต่างป๊อปอัป)',
+	'command.lookupSelection': 'ค้นหาข้อความที่เลือกในแผงพจนานุกรม',
 	'menu.searchInEzdict': 'ค้นหาใน Ezdict: "{query}"'
 };
