@@ -2,6 +2,8 @@ import { App, Notice, PluginSettingTab, Setting, SettingDefinitionItem } from 'o
 import type EzdictPlugin from './main';
 import { DictSearchMode } from './types';
 
+const SAMPLE_DICT_URL = 'https://dl.mahabodhi.co/downloadFile?id=Kqf9yp2wb0PRgLV';
+
 export class EzdictSettingTab extends PluginSettingTab {
 	plugin: EzdictPlugin;
 
@@ -45,10 +47,10 @@ export class EzdictSettingTab extends PluginSettingTab {
 						}
 					},
 					{
-						name: '從網址下載辭典 (Download Dictionary from URL)',
-						desc: '輸入辭典檔案（.md 或 .zip）的直接下載網址。若是 .zip 壓縮包，將自動解壓縮至辭典目錄並刪除 .zip 檔案。',
+						name: '下載範例辭典 (Download Sample Dictionaries)',
+						desc: '一鍵下載官方精選範例辭典包（包含常用辭典 .md 檔案），自動解壓縮至辭典目錄並建立索引。',
 						render: (setting: Setting) => {
-							this.buildDownloadControl(setting);
+							this.buildDownloadSampleControl(setting);
 						}
 					},
 					{
@@ -146,30 +148,17 @@ export class EzdictSettingTab extends PluginSettingTab {
 		}
 	}
 
-	private buildDownloadControl(setting: Setting): void {
-		let downloadUrlInput = '';
-		setting.addText(text => {
-			text.setPlaceholder('https://example.com/dictionaries.zip');
-			text.inputEl.addClass('ezdict-settings-input');
-			text.onChange(value => {
-				downloadUrlInput = value.trim();
-			});
-		});
-
+	private buildDownloadSampleControl(setting: Setting): void {
 		setting.addButton(button => button
-			.setButtonText('⬇️ 下載並匯入')
+			.setButtonText('⬇️ 下載範例辭典')
 			.setCta()
 			.onClick(async () => {
-				if (!downloadUrlInput) {
-					new Notice('⚠️ 請先輸入辭典下載網址');
-					return;
-				}
 				button.setDisabled(true);
-				button.setButtonText('下載中…');
+				button.setButtonText('連線下載中…');
 
 				try {
 					const result = await this.plugin.downloader.downloadAndImport(
-						downloadUrlInput,
+						SAMPLE_DICT_URL,
 						this.plugin.settings.dictDirectory,
 						(status) => {
 							button.setButtonText(status);
@@ -181,10 +170,10 @@ export class EzdictSettingTab extends PluginSettingTab {
 					await this.plugin.engine.initialize();
 					await this.plugin.saveIndexCache();
 
-					button.setButtonText('✅ 匯入完成');
+					button.setButtonText('✅ 下載完成');
 					window.setTimeout(() => {
 						button.setDisabled(false);
-						button.setButtonText('⬇️ 下載並匯入');
+						button.setButtonText('⬇️ 下載範例辭典');
 					}, 3000);
 				} catch (err) {
 					const errMsg = err instanceof Error ? err.message : String(err);
@@ -192,7 +181,7 @@ export class EzdictSettingTab extends PluginSettingTab {
 					button.setDisabled(false);
 					button.setButtonText('❌ 下載重試');
 					window.setTimeout(() => {
-						button.setButtonText('⬇️ 下載並匯入');
+						button.setButtonText('⬇️ 下載範例辭典');
 					}, 3000);
 				}
 			}));
@@ -256,11 +245,11 @@ export class EzdictSettingTab extends PluginSettingTab {
 					await this.plugin.saveIndexCache();
 				}));
 
-		// 3. Download Dictionary from URL Setting
-		const downloadSetting = new Setting(containerEl)
-			.setName('從網址下載辭典 (Download Dictionary from URL)')
-			.setDesc('輸入辭典檔案（.md 或 .zip）的直接下載網址。若是 .zip 壓縮包，將自動解壓縮至辭典目錄並刪除 .zip 檔案。');
-		this.buildDownloadControl(downloadSetting);
+		// 3. Download Sample Dictionaries Setting
+		const downloadSampleSetting = new Setting(containerEl)
+			.setName('下載範例辭典 (Download Sample Dictionaries)')
+			.setDesc('一鍵下載官方精選範例辭典包（包含常用辭典 .md 檔案），自動解壓縮至辭典目錄並建立索引。');
+		this.buildDownloadSampleControl(downloadSampleSetting);
 
 		// 4. Manual Re-index Button
 		const reindexSetting = new Setting(containerEl)
