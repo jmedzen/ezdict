@@ -10,7 +10,7 @@
 ---
 
 <a name="english"></a>
-## 🇬🇧 English
+## English
 
 **`Ezdict`** is a lightning-fast, 100% offline dictionary lookup and reader plugin for [Obsidian](https://obsidian.md). Specifically engineered for massive multi-megabyte Markdown dictionaries (e.g., Buddhist encyclopedias, literature lexicons, terminology databases), Ezdict eliminates Obsidian freezing when opening huge files by using instant byte-range file slicing.
 
@@ -36,7 +36,7 @@ Go to **Settings ➔ Ezdict**:
 ---
 
 <a name="繁體中文"></a>
-## 🇹🇼 繁體中文
+## 繁體中文
 
 **`Ezdict`** 是一款專為 [Obsidian](https://obsidian.md) 設計的高效能、純離線 Markdown 辭典查詢與閱讀外掛。特別針對數十 MB 巨型辭典進行底層優化，徹底解決開啟大檔案時畫面卡頓的問題。
 
@@ -62,7 +62,7 @@ Go to **Settings ➔ Ezdict**:
 ---
 
 <a name="简体中文"></a>
-## 🇨🇳 简体中文
+## 简体中文
 
 **`Ezdict`** 是一款专为 [Obsidian](https://obsidian.md) 打造的高性能、纯离线 Markdown 词典查询与阅读插件。针对数十 MB 超大型词典文件进行深度底层优化，彻底解决打开大文件时的卡顿问题。
 
@@ -81,7 +81,7 @@ Go to **Settings ➔ Ezdict**:
 ---
 
 <a name="español"></a>
-## 🇪🇸 Español
+## Español
 
 **`Ezdict`** es un complemento de consulta y lectura de diccionarios Markdown 100% sin conexión y ultrarrápido para [Obsidian](https://obsidian.md). Diseñado específicamente para diccionarios grandes de varios megabytes, elimina los bloqueos al abrir archivos gigantes mediante la lectura instantánea por rangos de bytes.
 
@@ -100,7 +100,7 @@ Go to **Settings ➔ Ezdict**:
 ---
 
 <a name="日本語"></a>
-## 🇯🇵 日本語
+## 日本語
 
 **`Ezdict`** は、[Obsidian](https://obsidian.md) 向けの超高速・完全オフライン対応 Markdown 辞書検索・閲覧プラグインです。数十MBに及ぶ巨大な辞書ファイル（仏教大辞典、文学用語集、専門百科事典など）でも、ファイル読み込みによるフリーズを発生させず、バイト範囲の即時スライスによってミリ秒単位で瞬時に見出し語を表示します。
 
@@ -119,7 +119,7 @@ Go to **Settings ➔ Ezdict**:
 ---
 
 <a name="한국어"></a>
-## 🇰🇷 한국어
+## 한국어
 
 **`Ezdict`**는 [Obsidian](https://obsidian.md)을 위한 초고속 완전 오프라인 Markdown 사전 검색 및 리더 플러그인입니다. 수십 메가바이트 크기의 방대한 마크다운 사전 파일을 열 때 발생하는 지연 현상을 바이트 단위 슬라이싱 기술을 통해 완벽하게 해결합니다.
 
@@ -138,7 +138,7 @@ Go to **Settings ➔ Ezdict**:
 ---
 
 <a name="ไทย"></a>
-## 🇹🇭 ไทย
+## ไทย
 
 **`Ezdict`** เป็นปลั๊กอินค้นหาและอ่านพจนานุกรม Markdown แบบออฟไลน์ 100% ที่เร็วเป็นพิเศษสำหรับ [Obsidian](https://obsidian.md) ออกแบบมาโดยเฉพาะสำหรับไฟล์พจนานุกรมขนาดใหญ่หลายสิบเมกะไบต์ ช่วยแก้ปัญหาการค้างของโปรแกรมด้วยเทคโนโลยีการอ่านไฟล์ตามช่วงไบต์ในทันที
 
