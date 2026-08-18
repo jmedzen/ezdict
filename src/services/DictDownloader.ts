@@ -198,6 +198,6 @@ export class DictDownloader {
 		const filePath = normalizedDir ? `${normalizedDir}/${fileName}` : fileName;
 		const copy = new Uint8Array(data.byteLength);
 		copy.set(data);
-		await adapter.writeBinary(filePath, copy.buffer as ArrayBuffer);
+		await adapter.writeBinary(filePath, copy.buffer);
 	}
 }
