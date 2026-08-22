@@ -12,147 +12,209 @@
 <a name="english"></a>
 ## English
 
-**`Ezdict`** is a lightning-fast, 100% offline dictionary lookup and reader plugin for [Obsidian](https://obsidian.md). Specifically engineered for massive multi-megabyte Markdown dictionaries (e.g., Buddhist encyclopedias, literature lexicons, terminology databases), Ezdict eliminates Obsidian freezing when opening huge files by using instant byte-range file slicing.
+**`Ezdict`** turns standard Markdown files into blazing-fast, offline dictionaries inside [Obsidian](https://obsidian.md). Whether you want to browse massive reference lexicons or craft your own personal terminology databases, Ezdict offers lightning-speed lookups with zero memory lag.
 
-### ✨ Key Features
+### 🌟 4 Core Pillars
 
-- ⚡ **Byte-Range Instant Slicing (< 1ms)**: Slices and reads dictionary definitions directly from disk via byte offsets (`byteOffset`) on demand.
-- 🔍 **3 Professional Search Modes**:
-  - 📖 **Prefix**: Instant $O(\log N)$ binary search on headwords with zero latency.
-  - 🔍 **Fuzzy**: Fast substring matching based on CJK bigram intersection.
-  - 📑 **Full-Text**: Cross-dictionary full-text search with multi-term `AND` queries, proximity distance filtering, and multi-mode result caching.
-- 📥 **One-Click Sample Dictionary Download**: Download official curated sample dictionaries directly from plugin settings with automatic ZIP extraction and indexing.
-- 🔗 **In-Panel Internal Link Navigation**: Click `[[wikilinks]]` within definitions to jump directly inside the reader with history back stack.
-- 🎨 **Deep Theme & i18n Integration**: Fully integrated with Obsidian theme colors, font scaling, and multi-language support (English, Traditional Chinese, Simplified Chinese, Spanish, Japanese, Korean, Thai).
-- 📝 **Selection Lookup & One-Click Citation**: Look up highlighted text via right-click menu or modal, and insert definitions as Callouts (`> [!quote]`), Footnotes (`[^term]`), or Wikilinks (`[[term]]`).
+1. 📖 **Turn Any Markdown into a Dictionary**
+   - No proprietary formats (like MDX or SQLite). Any plain `.md` file in your folder instantly becomes a full-featured dictionary.
+   - Any heading (`### Headword`) automatically serves as an indexed dictionary entry.
+2. ✍️ **Craft & Edit Your Own Dictionaries with Ease**
+   - Write your own glossaries, course vocabularies, medical codices, legal terms, or personal encyclopedias using human-readable Markdown.
+   - Fully supports native Obsidian formatting: Callouts, LaTeX math (`$E=mc^2$`), tables, images, and clickable internal `[[wikilinks]]`.
+3. ⚡ **Ultra-High Performance (< 1ms Slicing, Zero Freezes)**
+   - Solves the notorious 20–40 second freeze when opening 20MB~100MB+ Markdown files in Obsidian.
+   - **Byte-Range Slicing**: Calculates byte offsets (`byteOffset`) and streams only the needed entry directly from disk in under 1ms.
+   - **3 Search Modes**:
+     - 📖 **Prefix**: Instant $O(\log N)$ binary search with zero latency.
+     - 🔍 **Fuzzy**: Substring matching based on CJK bigram intersection.
+     - 📑 **Full-Text**: Cross-dictionary in-body search with multi-word `AND` queries and proximity distance filtering.
+4. 🔒 **100% Offline, Private & Effortlessly Shareable**
+   - Completely local: Zero telemetry, zero external server dependency, works seamlessly in air-gapped environments.
+   - **Easy to Share**: Dictionaries are just plain `.md` files or `.zip` archives. Sync via Git, iCloud, or Dropbox, or share with colleagues and students in one click.
+
+---
+
+### ✍️ How to Write Your Own Dictionary
+
+Writing a dictionary is as simple as creating a standard Markdown note:
+
+```markdown
+### Prajna
+Direct insight into the true nature of reality. In Mahayana Buddhism, it is the wisdom that understands emptiness (Śūnyatā).
+
+> [!tip] Related Concepts
+> See also [[Sunyata]] and [[Nirvana]].
+
+### Nirvana
+The ultimate state of liberation and freedom from suffering.
+```
+
+---
+
+### 🔍 Search, Navigate & Cite
+
+- **In-Reader Wikilink Jumping**: Click `[[wikilinks]]` inside definitions to navigate immediately inside the Ezdict reader without opening extra tabs, with full history back/forward navigation.
+- **Selection Lookup**: Highlight any text in your note ➔ Right-click "Search in Ezdict" or press hotkey modal.
+- **One-Click Citation**: Insert definitions into your active note as **Callout (`> [!quote]`)**, **Footnote (`[^term]`)**, **Wikilink (`[[term]]`)**, or **Raw text**.
+
+---
 
 ### ⚙️ Quick Configuration
 
-Go to **Settings ➔ Ezdict**:
-- **Dictionary Path**: Directory containing dictionary `.md` files (Vault relative or absolute disk path).
-- **Entry Heading Level**: Heading level marking headwords in Markdown (`h2 ~ h6` or auto-detect).
-- **Download Sample Dictionaries**: Click to download official sample dictionaries in one click.
+Open Obsidian **Settings ➔ Ezdict**:
+
+| Setting | Description | Default |
+| :--- | :--- | :--- |
+| **Dictionary Path** | Folder containing `.md` dictionary files (relative or absolute). | `dictionary_folder` |
+| **Entry Heading Level** | Heading level defining headwords (`h2 ~ h6` or auto-detect). | `h3 (###)` |
+| **Download Sample Dictionaries** | One-click download of curated sample dictionaries with auto-unzip. | Button |
+| **Default Search Mode** | Initial mode when searching (Prefix / Fuzzy / Full-Text). | Prefix |
+| **Citation Template** | Format when inserting definitions into notes. | Callout (`> [!quote]`) |
 
 ---
 
 <a name="繁體中文"></a>
 ## 繁體中文
 
-**`Ezdict`** 是一款專為 [Obsidian](https://obsidian.md) 設計的高效能、純離線 Markdown 辭典查詢與閱讀外掛。特別針對數十 MB 巨型辭典進行底層優化，徹底解決開啟大檔案時畫面卡頓的問題。
+**`Ezdict`** 是一款專為 [Obsidian](https://obsidian.md) 設計的高效能、純離線 Markdown 辭典外掛。它能將任意 `.md` 筆記檔案直接轉化為即查即用的專業辭典，讓您輕鬆打造、離線查閱並隨心分享屬於自己的知識庫。
 
-### ✨ 核心特色
+### 🌟 4 大核心特色
 
-- ⚡ **Byte-Range 毫秒級切片讀取 (< 1ms)**：自研 Section 切片索引，按需透過位元組偏移量（`byteOffset`）讀取詞條，單詞讀取耗時 **< 1ms**。
-- 🔍 **三種專業檢索模式**：
-  - 📖 **詞條前綴 (Prefix)**：基於 $O(\log N)$ 二分搜尋，0 延遲隨打即顯。
-  - 🔍 **詞條模糊 (Fuzzy)**：基於 CJK Bigram 集合求交集，快速匹配任意子字串。
-  - 📑 **內文全文 (Full-Text)**：跨辭典全文檢索，支援空白多詞交集 (AND) 與鄰近詞距上限過濾。
-- 📥 **一鍵下載範例辭典**：設定頁支援一鍵從雲端下載官方精選辭典包，自動解壓縮至辭典目錄並建立索引。
-- 🔗 **辭典內部連結秒開跳轉**：內文中的 `[[詞條]]` 內部連結直接在側邊欄秒開，支援多層歷史返回。
-- 🎨 **多國語言 i18n 與主題適配**：支援繁中、簡中、英文、西文、日文、韓文、泰文 7 大語系；字體大小自動連動 Obsidian 外觀設定。
-- 📝 **劃詞即查與一鍵引用**：支援右鍵選單劃詞即查，一鍵將釋義插入為引用區塊 (`> [!quote]`)、腳註 (`[^詞條]`) 或雙向連結 (`[[詞條]]`)。
+1. 📖 **把 Markdown 檔案直接變成辭典**
+   - 告別 MDX、StarDict 或 SQLite 等專有封閉格式，**純文字 `.md` 檔案就是辭典**。
+   - 檔案內只要有 Markdown 標題（如 `### 詞頭`），外掛便會自動掃描並建立高精度索引。
+2. ✍️ **自由編寫屬於你的專屬辭典**
+   - 無論是個人生詞庫、專業學科術語（醫學、法律、佛學、文史）、讀書筆記還是各類百科，都能用最熟悉的 Markdown 自由編寫與維護。
+   - 完整支援 Obsidian 原生語法：Callout 提示框、LaTeX 數學公式（`$E=mc^2$`）、表格、圖片以及 `[[雙向連結]]`。
+3. ⚡ **極致高效能（< 1ms 切片讀取、零卡頓）**
+   - 徹底根治 Obsidian 開啟 20MB～100MB+ 巨型 Markdown 檔案時嚴重卡頓 20~40 秒的痛點。
+   - **Byte-Range 毫秒級切片**：依位元組偏移量（`byteOffset`）按需精確讀取單條詞義，耗時 **< 1ms**，不佔記憶體。
+   - **三種專業檢索模式**：
+     - 📖 **詞條前綴 (Prefix)**：基於 $O(\log N)$ 二分搜尋，0 延遲隨打即顯。
+     - 🔍 **詞條模糊 (Fuzzy)**：基於 CJK Bigram 快速匹配任意子字串。
+     - 📑 **內文全文 (Full-Text)**：跨辭典內文檢索，支援空白多詞交集 (AND) 與鄰近詞距上限過濾。
+4. 🔒 **100% 離線隨身、隨心分享**
+   - **純本機運作**：無須任何後端伺服器或連網環境，保護個人資料隱私與離線使用體驗。
+   - **極簡分享與同步**：辭典就是普通的 `.md` 檔案或 `.zip` 壓縮包，可透過 Git、iCloud、Dropbox 輕鬆跨裝置同步，或一鍵打包分享給朋友與研究夥伴；設定頁亦支援一鍵下載官方範例辭典包。
 
-### ⚙️ 快速設定
+---
+
+### ✍️ 如何編寫自己的辭典
+
+編寫辭典就像寫一般 Markdown 筆記一樣直覺：
+
+```markdown
+### 般若
+梵語 prajñā。意譯為智慧。指通達真理、證悟空性之最高智慧。
+
+> [!tip] 相關概念
+> 請參見 [[空性]] 與 [[涅槃]]。
+
+### 涅槃
+梵語 nirvāṇa。意譯為滅度、寂滅。指斷除一切煩惱，達到究竟解脫之境界。
+```
+
+---
+
+### 🔍 查詢、跳轉與一鍵引用
+
+- **釋義內跳轉**：點擊釋義中的 `[[詞條]]` 連結直接在側邊欄秒開，支援多層歷史返回（`← 前一條 / 後一條 →`）。
+- **劃詞即查**：在筆記中選取文字 ➔ 右鍵選單「在 Ezdict 查詢」或快捷鍵即刻彈窗查詢。
+- **一鍵引用**：一鍵將詞條釋義插入為 **引用區塊 (`> [!quote]`)**、**腳註 (`[^詞條]`)**、**雙向連結 (`[[詞條]]`)** 或 **原始文字**。
+
+---
+
+### ⚙️ 快速設定指南
 
 開啟 Obsidian **「設定」➔「Ezdict」**：
-- **辭典目錄路徑**：存放 `.md` 辭典的資料夾（支援相對或絕對路徑）。
-- **詞條標題層級**：定義作為詞條開頭的標題層級（預設 `h3 ###`）。
-- **下載範例辭典**：點擊按鈕一鍵取得官方範例辭典包。
+
+| 設定項目 | 說明 | 預設值 |
+| :--- | :--- | :--- |
+| **辭典目錄路徑** | 存放辭典 `.md` 檔案的資料夾（支援相對或絕對路徑）。 | `dictionary_folder` |
+| **詞條標題層級** | 定義作為詞條開頭的標題層級（支援 `h2 ~ h6` 或自動偵測）。 | `h3 (###)` |
+| **下載範例辭典** | 一鍵自雲端下載官方精選辭典包並自動解壓縮建立索引。 | 按鈕 |
+| **預設搜尋模式** | 開啟側邊欄時的預設模式（詞條 / 模糊 / 全文）。 | 詞條 (Prefix) |
+| **一鍵引用格式** | 點擊插入筆記時使用的格式樣板。 | 引用區塊 (`> [!quote]`) |
 
 ---
 
 <a name="简体中文"></a>
 ## 简体中文
 
-**`Ezdict`** 是一款专为 [Obsidian](https://obsidian.md) 打造的高性能、纯离线 Markdown 词典查询与阅读插件。针对数十 MB 超大型词典文件进行深度底层优化，彻底解决打开大文件时的卡顿问题。
+**`Ezdict`** 是一款专为 [Obsidian](https://obsidian.md) 打造的高性能、纯离线 Markdown 词典插件。将任意 `.md` 笔记文件瞬间变为检索极速的专业词典，助您轻松创建、离线查阅与便捷分享个人知识库。
 
-### ✨ 核心特性
+### 🌟 4 大核心优势
 
-- ⚡ **Byte-Range 毫秒级切片读取 (< 1ms)**：基于字节偏移量（`byteOffset`）按需读取目标词条，单词读取耗时 **< 1ms**。
-- 🔍 **三种专业检索模式**：
-  - 📖 **词条前缀 (Prefix)**：$O(\log N)$ 二分搜索，0 延迟即时呈现。
-  - 🔍 **词条模糊 (Fuzzy)**：CJK Bigram 集合交集匹配，高效检索任意子字符串。
-  - 📑 **正文全文 (Full-Text)**：跨词典正文检索，支持空格多词交集 (AND) 与邻近词距过滤。
-- 📥 **一键下载示例词典**：在设置面板中一键下载官方精选词典包，自动解压至词典目录并建立索引。
-- 🔗 **词典内链即时跳转**：正文中的 `[[词条]]` 链接在阅读面板内直接跳转，支持多层历史返回。
-- 🎨 **多语言 i18n 与主题深度适配**：支持中、英、西、日、韩、泰等多种语言；字体大小自动同步系统外观。
-- 📝 **划词即查与一键引用**：支持划词右键菜单查询，一键插入为引用区块 (`> [!quote]`)、脚注 (`[^词条]`) 或双向链接 (`[[词条]]`)。
+1. 📖 **把 Markdown 文件直接变为词典**
+   - 无需任何专有格式（如 MDX、SQLite），**纯文本 `.md` 文件就是词典**。
+   - 文件内使用 Markdown 标题（如 `### 词头`）即可自动索引为词条。
+2. ✍️ **自由编写专属词典与术语库**
+   - 随心编写单词本、学科专业术语（医学、法学、佛学等）、文献专名或个人百科。
+   - 完美支持 Obsidian 原生语法：Callout 引用块、LaTeX 公式（`$E=mc^2$`）、表格与 `[[双向链接]]`。
+3. ⚡ **极致高性能（< 1ms 切片读取、告别卡顿）**
+   - 彻底解决 Obsidian 打开 20MB～100MB+ 大型 Markdown 文件卡死几十秒的问题。
+   - **Byte-Range 毫秒级切片**：根据字节偏移量按需读取单词释义，耗时 **< 1ms**。
+   - **3 种检索模式**：前缀秒搜（Prefix）、模糊匹配（Fuzzy）、正文全文检索（Full-Text）。
+4. 🔒 **100% 离线安全、随心分享**
+   - **纯本地运行**：零数据上传，无网络环境亦可稳定使用。
+   - **轻松同步与分享**：词典即为普通 `.md` 或 `.zip` 文件，可通过 Git/网盘同步，或一键分发给同学与团队。
 
 ---
 
 <a name="español"></a>
 ## Español
 
-**`Ezdict`** es un complemento de consulta y lectura de diccionarios Markdown 100% sin conexión y ultrarrápido para [Obsidian](https://obsidian.md). Diseñado específicamente para diccionarios grandes de varios megabytes, elimina los bloqueos al abrir archivos gigantes mediante la lectura instantánea por rangos de bytes.
+**`Ezdict`** convierte cualquier archivo Markdown estándar en un diccionario sin conexión y ultrarrápido dentro de [Obsidian](https://obsidian.md).
 
-### ✨ Características principales
+### 🌟 4 Pilares Fundamentales
 
-- ⚡ **Lectura instantánea por rangos de bytes (< 1ms)**: Lee definiciones directamente del disco mediante desplazamientos de bytes (`byteOffset`) bajo demanda.
-- 🔍 **3 modos de búsqueda profesionales**:
-  - 📖 **Prefijo**: Búsqueda binaria instantánea $O(\log N)$ con latencia cero.
-  - 🔍 **Difuso**: Coincidencia rápida de subcadenas basada en bigramas.
-  - 📑 **Texto completo**: Búsqueda en el cuerpo de todos los diccionarios con consultas `AND` multitérrmino y filtros de distancia de proximidad.
-- 📥 **Descarga de diccionarios de ejemplo en un clic**: Descarga diccionarios oficiales directamente desde la configuración con descompresión ZIP e indexación automática.
-- 🔗 **Navegación por enlaces internos**: Haga clic en `[[enlaces]]` dentro de las definiciones para navegar dentro del panel con historial de retroceso.
-- 🎨 **Integración con temas e i18n**: Totalmente compatible con 7 idiomas (inglés, español, chino tradicional/simplificado, japonés, coreano y tailandés).
-- 📝 **Búsqueda de selección y citas en un clic**: Busque texto seleccionado mediante el menú contextual y cite definiciones como bloques (`> [!quote]`), notas al pie (`[^término]`) o enlaces internos (`[[término]]`).
+1. 📖 **Convierte Markdown en Diccionarios**: Sin formatos propietarios. Cualquier archivo `.md` con encabezados (`### Término`) se convierte al instante en un diccionario indexado.
+2. ✍️ **Crea y Edita tus Propios Diccionarios**: Escribe glosarios, términos médicos, jurídicos o enciclopedias personales con sintaxis Markdown nativa (Callouts, LaTeX, tablas y `[[enlaces]]`).
+3. ⚡ **Rendimiento Ultra Alto (< 1ms)**: Elimina bloqueos en archivos grandes de 20MB~100MB+ leyendo solo las entradas necesarias mediante desplazamiento de bytes (`byteOffset`). Incluye 3 modos de búsqueda (Prefijo, Difuso y Texto completo).
+4. 🔒 **100% Sin Conexión y Fácil de Compartir**: Totalmente privado y local. Comparte tus diccionarios en archivos `.md` o `.zip` con un solo clic.
 
 ---
 
 <a name="日本語"></a>
 ## 日本語
 
-**`Ezdict`** は、[Obsidian](https://obsidian.md) 向けの超高速・完全オフライン対応 Markdown 辞書検索・閲覧プラグインです。数十MBに及ぶ巨大な辞書ファイル（仏教大辞典、文学用語集、専門百科事典など）でも、ファイル読み込みによるフリーズを発生させず、バイト範囲の即時スライスによってミリ秒単位で瞬時に見出し語を表示します。
+**`Ezdict`** は、通常の Markdown ファイルを [Obsidian](https://obsidian.md) 内で超高速なオフライン辞書に変換するプラグインです。
 
-### ✨ 主な機能
+### 🌟 4つのコア機能
 
-- ⚡ **バイト範囲のミリ秒スライス読み込み (< 1ms)**: バイトオフセット（`byteOffset`）により、必要な見出し語の本文のみをディスクからオンデマンドで直接読み込みます。
-- 🔍 **3つの専門検索モード**:
-  - 📖 **見出し語前方一致 (Prefix)**: $O(\log N)$ 二分探索による遅延ゼロの即時検索。
-  - 🔍 **部分一致 (Fuzzy)**: CJK Bigram 交差アルゴリズムによる高速あいまい検索。
-  - 📑 **本文全文検索 (Full-Text)**: 複数キーワード (AND) 検索、近接単語距離フィルタリング、検索結果キャッシュに対応。
-- 📥 **サンプル辞書のワンクリックダウンロード**: 設定画面から公式サンプル辞書パックをワンクリックでダウンロード、自動解凍およびインデックス作成。
-- 🔗 **辞書内リンクの即時ジャンプ**: 解説文中の `[[内部リンク]]` をクリックして辞書内で即座にジャンプ表示、多段階の履歴「戻る」に対応。
-- 🎨 **Obsidian テーマ連動 & 多言語対応**: 日本語、英語、繁体字/簡体字中国語、スペイン語、韓国語、タイ語など7言語の i18n に対応。フォントサイズは Obsidian の外観設定と自動同期。
-- 📝 **選択テキスト検索 & ワンクリック引用**: 右クリックメニューからの辞書検索、引用ブロック (`> [!quote]`)、脚注 (`[^見出し]`)、内部リンク (`[[見出し]]`) へのワンクリック挿入。
+1. 📖 **Markdown ファイルをそのまま辞書化**: 独自形式（MDX/SQLite等）は不要。見出し（`### 見出し語`）を記述した `.md` ファイルがそのまま辞書になります。
+2. ✍️ **自分だけの専用辞書を自由に作成**: 専門用語集、語学ノート、法律・医学用語、百科事典などを Markdown で自由に作成・編集可能（Callout、LaTeX数式、`[[内部リンク]]` 対応）。
+3. ⚡ **超高速・フリーズゼロ (< 1ms スライス)**: 20MB〜100MB+ の巨大ファイルでも、バイトオフセット（`byteOffset`）による即時スライスでフリーズなくミリ秒未満で表示。前方一致・あいまい・全文検索の3モード搭載。
+4. 🔒 **完全オフライン・手軽に共有**: 外部サーバー通信なしで安心。辞書は通常の `.md` や `.zip` なので、クラウド同期や友人・研究仲間への配布も簡単です。
 
 ---
 
 <a name="한국어"></a>
 ## 한국어
 
-**`Ezdict`**는 [Obsidian](https://obsidian.md)을 위한 초고속 완전 오프라인 Markdown 사전 검색 및 리더 플러그인입니다. 수십 메가바이트 크기의 방대한 마크다운 사전 파일을 열 때 발생하는 지연 현상을 바이트 단위 슬라이싱 기술을 통해 완벽하게 해결합니다.
+**`Ezdict`**는 일반 Markdown 파일을 [Obsidian](https://obsidian.md)에서 초고속 오프라인 사전으로 활용할 수 있게 해주는 플러그인입니다.
 
-### ✨ 주요 기능
+### 🌟 4대 핵심 특징
 
-- ⚡ **바이트 범위 초고속 슬라이싱 (< 1ms)**: 바이트 오프셋(`byteOffset`)을 사용하여 필요한 표제어 본문만 디스크에서 즉시 읽어옵니다.
-- 🔍 **3가지 전문 검색 모드**:
-  - 📖 **표제어 접두사 (Prefix)**: $O(\log N)$ 이진 검색으로 지연 없는 즉각적인 결과 제공.
-  - 🔍 **유사 검색 (Fuzzy)**: CJK Bigram 교집합 기반의 빠른 부분 문자열 검색.
-  - 📑 **본문 전체 텍스트 (Full-Text)**: 다중 키워드(AND) 검색 및 단어 근접 거리 필터링 지원.
-- 📥 **원클릭 샘플 사전 다운로드**: 플러그인 설정에서 공식 샘플 사전 패키지를 한 번의 클릭으로 다운로드하고 자동 압축 해제 및 인덱싱.
-- 🔗 **사전 내부 링크 이동**: 정의 내 `[[내부 링크]]`를 클릭하여 사전 리더 내에서 즉시 이동하며 뒤로 가기 히스토리 지원.
-- 🎨 **다국어 i18n 및 테마 통합**: 한국어, 영어, 중국어(번체/간체), 일본어, 스페인어, 태국어 등 7개 언어 지원 및 폰트 크기 자동 동기화.
-- 📝 **선택 영역 검색 및 원클릭 인용**: 우클릭 메뉴 검색 지원 및 인용 블록(`> [!quote]`), 각주(`[^표제어]`), 내부 링크(`[[표제어]]`) 형식으로 손쉬운 삽입.
+1. 📖 **Markdown 파일을 즉시 사전으로 변환**: 전용 포맷 변환 없이 일반 `.md` 파일의 제목(`### 표제어`)을 그대로 사전 항목으로 자동 색인합니다.
+2. ✍️ **나만의 맞춤형 사전 자유 제작**: 전문 용어집, 학습 단어장, 학술 용어 사전을 Markdown으로 쉽게 작성하고 Callout, LaTeX 수식, `[[내부 링크]]`를 완벽 지원합니다.
+3. ⚡ **초고속 성능 (< 1ms 슬라이싱, 지연 제로)**: 수십 MB 대용량 파일도 바이트 오프셋 슬라이싱 기술로 멈춤 없이 1ms 미만으로 즉시 로드합니다. (접두사/유사/전체 텍스트 검색 지원)
+4. 🔒 **100% 오프라인 & 간편한 공유**: 외부 서버 없는 완벽한 개인정보 보호 및 `.md` / `.zip` 파일 기반의 손쉬운 동기화와 공유.
 
 ---
 
 <a name="ไทย"></a>
 ## ไทย
 
-**`Ezdict`** เป็นปลั๊กอินค้นหาและอ่านพจนานุกรม Markdown แบบออฟไลน์ 100% ที่เร็วเป็นพิเศษสำหรับ [Obsidian](https://obsidian.md) ออกแบบมาโดยเฉพาะสำหรับไฟล์พจนานุกรมขนาดใหญ่หลายสิบเมกะไบต์ ช่วยแก้ปัญหาการค้างของโปรแกรมด้วยเทคโนโลยีการอ่านไฟล์ตามช่วงไบต์ในทันที
+**`Ezdict`** เปลี่ยนไฟล์ Markdown ทั่วไปให้เป็นพจนานุกรมออฟไลน์ความเร็วสูงใน [Obsidian](https://obsidian.md)
 
-### ✨ คุณสมบัติเด่น
+### 🌟 4 จุดเด่นสำคัญ
 
-- ⚡ **การอ่านไฟล์ตามช่วงไบต์ (< 1ms)**: อ่านเนื้อหาคำศัพท์โดยตรงจากดิสก์ผ่าน byte offset (`byteOffset`) ตามความต้องการภายในเสี้ยววินาที
-- 🔍 **3 โหมดการค้นหาขั้นสูง**:
-  - 📖 **คำขึ้นต้น (Prefix)**: ค้นหาแบบทวิภาค $O(\log N)$ อย่างรวดเร็วโดยไม่มีความหน่วง
-  - 🔍 **คลุมเครือ (Fuzzy)**: ค้นหาข้อความย่อยอย่างรวดเร็ว
-  - 📑 **ข้อความเต็ม (Full-Text)**: ค้นหาในเนื้อหาทั้งหมด รองรับการค้นหาหลายคำพร้อมกัน (AND) และการกรองระยะห่างของคำ
-- 📥 **ดาวน์โหลดพจนานุกรมตัวอย่างในคลิกเดียว**: ดาวน์โหลดชุดพจนานุกรมตัวอย่างจากเมนูการตั้งค่า พร้อมแตกไฟล์ ZIP และสร้างดัชนีอัตโนมัติ
-- 🔗 **ลิงก์ข้ามคำศัพท์ในแผงอ่าน**: คลิก `[[ลิงก์ภายใน]]` ในคำอธิบายเพื่อเปิดอ่านคำศัพท์ที่เกี่ยวข้องได้ทันที พร้อมประวัติการย้อนกลับ
-- 🎨 **รองรับหลายภาษาและธีม**: รองรับ 7 ภาษา (ไทย, อังกฤษ, จีนตัวเต็ม/ตัวย่อ, สเปน, ญี่ปุ่น, เกาหลี) และปรับขนาดฟอนต์ตามการตั้งค่าของ Obsidian อัตโนมัติ
-- 📝 **ค้นหาข้อความที่เลือกและอ้างอิงง่ายดาย**: ค้นหาข้อความที่เลือกผ่านเมนูคลิกขวา และแทรกคำอธิบายลงในบันทึกเป็นกล่องข้อความอ้างอิง (`> [!quote]`), เชิงอรรถ (`[^คำศัพท์]`) หรือลิงก์ภายใน (`[[คำศัพท์]]`)
+1. 📖 **เปลี่ยนไฟล์ Markdown ให้เป็นพจนานุกรม**: ไม่ต้องแปลงไฟล์เป็นรูปแบบเฉพาะ แค่ใช้หัวข้อ (`### คำศัพท์`) ในไฟล์ `.md` ก็กลายเป็นพจนานุกรมทันที
+2. ✍️ **สร้างและแก้ไขพจนานุกรมของตัวเองได้ง่ายดาย**: เขียนคำศัพท์เฉพาะทาง บันทึกการเรียน หรือสารานุกรมส่วนตัวด้วย Markdown พร้อมรองรับ Callouts, สูตร LaTeX และ `[[ลิงก์ภายใน]]`
+3. ⚡ **ประสิทธิภาพสูงสุด (< 1ms อ่านไฟล์เร็วทันใจ ไม่ค้าง)**: อ่านเฉพาะส่วนคำศัพท์ที่ต้องการผ่าน Byte-Range ช่วยแก้ปัญหาโปรแกรมค้างจากไฟล์ขนาดใหญ่ 20MB~100MB+ พร้อมโหมดค้นหา 3 แบบ
+4. 🔒 **ออฟไลน์ 100% ปลอดภัยและแชร์ต่อง่าย**: ทำงานในเครื่องทั้งหมด ปลอดภัย ไร้กังวล และแชร์ไฟล์ `.md` หรือ `.zip` ให้เพื่อนร่วมงานได้ทันที
 
 ---
 
