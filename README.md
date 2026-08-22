@@ -1,4 +1,5 @@
-# 🪷 Ezdict — High-Performance Offline Markdown Dictionary Plugin for Obsidian
+# 🪷 Ezdict — Turn Any Markdown into a Fast, Offline & Shareable Dictionary for Obsidian
+> ⚡ **Craft custom lexicons in plain Markdown, lookup entries at < 1ms speed, and share completely offline.**
 
 [![GitHub Release](https://img.shields.io/github/v/release/jmedzen/ezdict?color=orange)](https://github.com/jmedzen/ezdict/releases)
 [![Obsidian Downloads](https://img.shields.io/badge/Obsidian-Community%20Plugin-7C3AED.svg)](https://obsidian.md/plugins?id=ezdict)
