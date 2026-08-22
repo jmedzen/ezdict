@@ -1,6 +1,6 @@
 {
   "name": "ezdict",
-  "version": "1.2.10",
+  "version": "1.2.11",
   "description": "High-performance offline dictionary reader and lookup plugin, designed for massive markdown reference books and dictionaries.",
   "main": "main.js",
   "scripts": {
